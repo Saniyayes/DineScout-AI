@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DineScout — AI Restaurant Intelligence & Dining Concierge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet Interactive Maps CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    /* ========================================================
+       DINESCOUT LUXURY CULINARY DESIGN SYSTEM
+       Themes: Midnight Gourmet (Default) & Daylight Bistro
+    ======================================================== */
+    :root {
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --primary-glow: rgba(249, 115, 22, 0.45);
+      --primary-soft: rgba(249, 115, 22, 0.16);
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-purple: #a855f7;
+      
+      /* Midnight Gourmet Tokens (Default) */
+      --bg-page: #060913;
+      --navbar-bg: rgba(10, 15, 26, 0.88);
+      --card-bg: rgba(20, 28, 45, 0.76);
+      --card-bg-hover: rgba(28, 40, 64, 0.92);
+      --card-inner-bg: rgba(13, 19, 33, 0.72);
+      --border-color: rgba(255, 255, 255, 0.12);
+      --border-color-hover: rgba(249, 115, 22, 0.55);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --text-title: #ffffff;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-subtle: #64748b;
+      --input-bg: rgba(13, 19, 33, 0.8);
+      --input-border: rgba(255, 255, 255, 0.16);
+      --tab-bar-bg: rgba(13, 19, 33, 0.78);
+      --tab-btn-bg: rgba(255, 255, 255, 0.07);
+      --tab-btn-color: #cbd5e1;
+      --tab-btn-active-bg: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      --tab-btn-active-color: #ffffff;
+      --modal-bg: rgba(15, 22, 36, 0.96);
+      --shadow-card: 0 16px 36px -10px rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-card-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(249, 115, 22, 0.28);
+      --glass-blur: blur(20px);
+    }
+
+    /* Daylight Bistro Alternate */
+    body.theme-light {
+      --bg-page: #f8fafc;
+      --navbar-bg: rgba(255, 255, 255, 0.92);
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-bg-hover: rgba(255, 255, 255, 1);
+      --card-inner-bg: rgba(241, 245, 249, 0.9);
+      --border-color: rgba(226, 232, 240, 0.95);
+      --border-color-hover: rgba(249, 115, 22, 0.6);
+      --border-subtle: rgba(226, 232, 240, 0.7);
+      --text-title: #0f172a;
+      --text-main: #1e293b;
+      --text-muted: #475569;
+      --text-subtle: #64748b;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --tab-bar-bg: rgba(255, 255, 255, 0.9);
+      --tab-btn-bg: #f1f5f9;
+      --tab-btn-color: #475569;
+      --tab-btn-active-bg: #0f172a;
+      --tab-btn-active-color: #ffffff;
+      --modal-bg: #ffffff;
+      --shadow-card: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+      --shadow-card-hover: 0 20px 40px -12px rgba(15, 23, 42, 0.16);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 15, 26, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(249, 115, 22, 0.45);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(249, 115, 22, 0.75);
+    }
+
+    /* ========================================================
+       ATMOSPHERIC BACKGROUND LAYER
+    ======================================================== */
+    .portal-bg-layer {
+      position: fixed;
+      inset: 0;
+      background-image: url('images/dishes_bg.jpg');
+      background-position: center center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      filter: brightness(0.48) contrast(1.15) saturate(1.25);
+      transform: scale(1.02);
+      z-index: -3;
+      transition: filter 0.4s ease, opacity 0.4s ease;
+      will-change: transform;
+    }
+
+    body.theme-light .portal-bg-layer {
+      filter: brightness(0.96) contrast(1.02) saturate(0.95);
+      opacity: 0.22;
+    }
+
+    .portal-ambient-layer {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 5%, rgba(249, 115, 22, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 10% 25%, rgba(234, 88, 12, 0.16) 0%, transparent 50%),
+        radial-gradient(circle at 90% 35%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(6, 9, 19, 0.72) 0%, rgba(10, 15, 26, 0.86) 45%, rgba(6, 9, 19, 0.95) 100%);
+      z-index: -2;
+      pointer-events: none;
+      transition: background 0.4s ease;
+    }
+
+    body.theme-light .portal-ambient-layer {
+      background:
+        radial-gradient(circle at 15% 15%, rgba(251, 146, 60, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 85% 30%, rgba(249, 115, 22, 0.08) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.96) 100%);
+    }
+
+    .portal-grid-overlay {
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+      background-size: 28px 28px;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    body.theme-light .portal-grid-overlay {
+      background-image: radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+    }
+
+    /* Top Accent Line */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #f97316 0%, #fb923c 50%, #f97316 100%);
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.7);
+      z-index: 1000;
+    }
+
+    /* ========================================================
+       NAVBAR
+    ======================================================== */
+    .navbar {
+      background: var(--navbar-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      padding: 16px 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 500;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .brand-icon {
+      font-size: 26px;
+      filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.6));
+    }
+
+    .brand h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-title);
+    }
+
+    .brand h2 span {
+      background: linear-gradient(135deg, #f97316, #fb923c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      background: rgba(249, 115, 22, 0.16);
+      color: #fb923c;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      border: 1px solid rgba(249, 115, 22, 0.35);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-link-btn {
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link-owner {
+      background: rgba(249, 115, 22, 0.14);
+      color: #fb923c;
+      border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+
+    .nav-link-owner:hover {
+      background: rgba(249, 115, 22, 0.26);
+      color: #ffffff;
+      border-color: rgba(249, 115, 22, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .nav-link-admin {
+      background: rgba(168, 85, 247, 0.14);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .nav-link-admin:hover {
+      background: rgba(168, 85, 247, 0.26);
+      color: #ffffff;
+      border-color: rgba(168, 85, 247, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .theme-toggle-btn {
+      background: var(--card-inner-bg);
+      color: var(--text-title);
+      border: 1px solid var(--border-color);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--primary);
+      background: rgba(249, 115, 22, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card-inner-bg);
+      border: 1px solid var(--border-color);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .notif-bell-wrapper {
+      position: relative;
+      cursor: pointer;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: var(--card-inner-bg);
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+    }
+
+    .notif-bell-wrapper:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .notif-badge-count {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #ef4444;
+      color: white;
+      border-radius: 10px;
+      padding: 1px 6px;
+      font-size: 10px;
+      font-weight: 800;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+      animation: pulseAlert 2s infinite;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.18); }
+    }
+
+    #notif-dropdown {
+      display: none;
+      position: absolute;
+      top: 56px;
+      right: 20px;
+      width: 340px;
+      background: var(--modal-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: 14px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
+      z-index: 1000;
+      overflow: hidden;
+      animation: fadeInDropdown 0.25s ease-out;
+    }
+
+    @keyframes fadeInDropdown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .notif-header {
+      padding: 12px 18px;
+      background: var(--card-inner-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .notif-header span {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-title);
+    }
+
+    .notif-header button {
+      background: none;
+      border: none;
+      color: #38bdf8;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .notif-list-container {
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    .logout-btn {
+      background: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #ffffff;
+      border-color: rgba(239, 68, 68, 0.5);
+      transform: translateY(-1px);
+    }
+
+    /* ========================================================
+       MAIN WRAPPER & HERO CONCIERGE SEARCH
+    ======================================================== */
+    .main-wrapper {
+      max-width: 1280px;
+      margin: 32px auto 70px auto;
+      padding: 0 24px;
+    }
+
+    .hero-container {
+      text-align: center;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      background: rgba(249, 115, 22, 0.15);
+      border: 1px solid rgba(249, 115, 22, 0.38);
+      border-radius: 20px;
+      color: #fb923c;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
+    }
+
+    .hero-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      color: var(--text-title);
+      margin-bottom: 10px;
+      line-height: 1.2;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #f97316 0%, #fb923c 60%, #fdba74 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 15.5px;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 28px auto;
+      line-height: 1.55;
+    }
+
+    /* ========================================================
+       HERO SEARCH CAPSULE
+    ======================================================== */
+    .search-capsule {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      padding: 24px 28px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .search-capsule::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 15%;
+      right: 15%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr 210px 170px auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .search-input-field {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      font-size: 14.5px;
+      outline: none;
+      transition: all 0.25s ease;
+      background: var(--input-bg);
+      color: var(--text-title);
+    }
+
+    .search-input-field::placeholder {
+      color: var(--text-subtle);
+    }
+
+    .search-input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+      background: rgba(13, 19, 33, 0.95);
+    }
+
+    body.theme-light .search-input-field:focus {
+      background: #ffffff;
+    }
+
+    .search-btn-cta {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+      box-shadow: 0 4px 18px rgba(249, 115, 22, 0.45);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .search-btn-cta:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(249, 115, 22, 0.6);
+    }
+
+    /* Vibe Pills */
+    .vibe-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+      justify-content: center;
+    }
+
+    .vibe-chip {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 7px 15px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .vibe-chip:hover {
+      background: rgba(249, 115, 22, 0.22);
+      color: #ffffff;
+      border-color: rgba(249, 115, 22, 0.55);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+    }
+
+    body.theme-light .vibe-chip {
+      background: rgba(15, 23, 42, 0.05);
+      border-color: rgba(15, 23, 42, 0.12);
+      color: var(--text-main);
+    }
+
+    body.theme-light .vibe-chip:hover {
+      background: rgba(249, 115, 22, 0.12);
+      border-color: var(--primary);
+      color: var(--primary-hover);
+    }
+
+    /* Stats Strip */
+    .stats-strip {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .stats-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .stats-item span.icon {
+      color: #fb923c;
+    }
+
+    /* ========================================================
+       FLOATING GLASS TAB DOCK
+    ======================================================== */
+    .tab-bar {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      background: var(--tab-bar-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      padding: 8px;
+      border-radius: 40px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      max-width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .tab-btn {
+      padding: 10px 22px;
+      background: var(--tab-btn-bg);
+      border: 1px solid transparent;
+      border-radius: 30px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--tab-btn-color);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-title);
+      background: rgba(255, 255, 255, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .tab-btn.active {
+      background: var(--tab-btn-active-bg);
+      color: var(--tab-btn-active-color);
+      box-shadow: 0 4px 16px rgba(249, 115, 22, 0.45);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Secondary Search Panels (For other tabs) */
+    .search-panel {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      padding: 28px 32px;
+      border-radius: 20px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 28px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .search-panel h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-title);
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+
+    .search-panel p.sub {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    /* ========================================================
+       FEED HEADER TOOLBAR (Filter Pills & Map Toggle)
+    ======================================================== */
+    .feed-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .feed-title-block h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-title);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .feed-title-block p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .filter-pills-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      background: var(--card-inner-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 7px 15px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .filter-pill:hover,
+    .filter-pill.active {
+      background: rgba(249, 115, 22, 0.16);
+      color: #fb923c;
+      border-color: rgba(249, 115, 22, 0.4);
+    }
+
+    .map-toggle-pill {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(99, 102, 241, 0.18));
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: #93c5fd;
+      padding: 7px 15px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .map-toggle-pill:hover {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(99, 102, 241, 0.3));
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    /* ========================================================
+       INTERACTIVE LEAFLET MAP CONTAINER
+    ======================================================== */
+    #interactive-map-container {
+      margin-bottom: 28px;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+    }
+
+    .map-header {
+      padding: 14px 20px;
+      background: var(--card-inner-bg);
+      color: var(--text-title);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .map-header span.title {
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #map-counter {
+      font-size: 12px;
+      background: rgba(249, 115, 22, 0.18);
+      border: 1px solid rgba(249, 115, 22, 0.35);
+      padding: 3px 12px;
+      border-radius: 14px;
+      color: #fb923c;
+      font-weight: 700;
+    }
+
+    #map {
+      height: 380px;
+      width: 100%;
+    }
+
+    /* Leaflet popup customization */
+    .leaflet-popup-content-wrapper {
+      background: #0f172a !important;
+      color: #ffffff !important;
+      border-radius: 12px !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    }
+    .leaflet-popup-tip {
+      background: #0f172a !important;
+    }
+
+    /* ========================================================
+       RESULTS GRID & RESTAURANT CARDS
+    ======================================================== */
+    #results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: 18px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-card-hover);
+      border-color: var(--border-color-hover);
+    }
+
+    /* Card Cover Image */
+    .card-img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      background: #070a13;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .card:hover .card-img {
+      transform: scale(1.07);
+    }
+
+    .card-img-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(11, 15, 25, 0.95) 0%, rgba(15, 23, 42, 0.45) 55%, transparent 100%);
+    }
+
+    .rating-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: linear-gradient(135deg, #15803d, #16a34a);
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+      z-index: 2;
+    }
+
+    .cuisine-tag-top {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      color: #e2e8f0;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      z-index: 2;
+      max-width: 60%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-img-title {
+      position: absolute;
+      bottom: 12px;
+      left: 16px;
+      right: 16px;
+      z-index: 2;
+    }
+
+    .card-img-title h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.25;
+      letter-spacing: -0.3px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+    }
+
+    .card-fav-btn {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      cursor: pointer;
+      font-size: 18px;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+    }
+
+    .card-fav-btn:hover {
+      transform: scale(1.15);
+      background: rgba(249, 115, 22, 0.35);
+      border-color: #f97316;
+    }
+
+    .card-body {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    .cuisines {
+      color: var(--text-muted);
+      font-size: 13.5px;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    /* Value Badges */
+    .value-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      background: rgba(14, 165, 233, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(14, 165, 233, 0.3);
+    }
+
+    .value-exceptional {
+      background: rgba(192, 38, 211, 0.16);
+      color: #e879f9;
+      border-color: rgba(192, 38, 211, 0.35);
+    }
+
+    .value-great {
+      background: rgba(22, 163, 74, 0.16);
+      color: #4ade80;
+      border-color: rgba(22, 163, 74, 0.35);
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      padding: 8px 0;
+      border-top: 1px dashed var(--border-subtle);
+      border-bottom: 1px dashed var(--border-subtle);
+    }
+
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .mood-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text-main);
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+
+    body.theme-light .mood-pill {
+      background: rgba(15, 23, 42, 0.05);
+      border-color: rgba(15, 23, 42, 0.1);
+      color: var(--text-main);
+    }
+
+    .user-review-snippet {
+      background: var(--card-inner-bg);
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 12.5px;
+      border-left: 3px solid var(--primary);
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .btn-summary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 9px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .btn-summary:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: var(--text-title);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-review-toggle {
+      background: rgba(249, 115, 22, 0.12);
+      color: #fb923c;
+      border: 1px solid rgba(249, 115, 22, 0.3);
+    }
+
+    .btn-review-toggle:hover {
+      background: rgba(249, 115, 22, 0.25);
+      color: #ffffff;
+      border-color: #f97316;
+    }
+
+    .btn-route {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: white;
+      border: none;
+      padding: 9px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(249, 115, 22, 0.35);
+    }
+
+    .btn-route:hover {
+      background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+      transform: translateY(-1px);
+    }
+
+    /* Review Form Container */
+    .card-review-form {
+      margin-top: 14px;
+      padding: 14px;
+      background: var(--card-inner-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      font-size: 13px;
+    }
+
+    .card-review-form select,
+    .card-review-form textarea {
+      background: var(--input-bg);
+      color: var(--text-title);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .card-review-form select:focus,
+    .card-review-form textarea:focus {
+      border-color: var(--primary);
+    }
+
+    /* ========================================================
+       TOP DISHES EXPLORER CARDS
+    ======================================================== */
+    .dish-card {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: 18px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .dish-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+      border-color: var(--border-color-hover);
+    }
+
+    .dish-card h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      color: var(--text-title);
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    /* ========================================================
+       MODAL SYSTEM
+    ======================================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 9, 19, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 20px;
+      animation: fadeInModal 0.25s ease-out;
+    }
+
+    @keyframes fadeInModal {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      background: var(--modal-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+      position: relative;
+      color: var(--text-main);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: var(--card-inner-bg);
+      border: 1px solid var(--border-color);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .sentiment-box {
+      background: var(--card-inner-bg);
+      padding: 16px;
+      border-radius: 14px;
+      margin: 18px 0;
+      border: 1px solid var(--border-color);
+    }
+
+    .pros-list, .cons-list {
+      margin: 8px 0 16px 20px;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .pros-list li { color: #4ade80; }
+    .cons-list li { color: #f87171; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .search-row {
+        grid-template-columns: 1fr;
+      }
+      .navbar {
+        padding: 14px 20px;
+      }
+      .hero-title {
+        font-size: 28px;
+      }
+      .card-actions {
+        grid-template-columns: 1fr;
+      }
+      .feed-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Multi-Layer Atmospheric Culinary Background -->
+<div class="portal-bg-layer" id="portal-bg-layer" aria-hidden="true"></div>
+<div class="portal-ambient-layer" id="portal-ambient-layer" aria-hidden="true"></div>
+<div class="portal-grid-overlay" aria-hidden="true"></div>
+
+<!-- Authentication Guard & Role Detection -->
+<script>
+  let token = localStorage.getItem("token");
+  if (!token && !localStorage.getItem("manual_logout")) {
+    fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: "testuser2", password: "123456" })
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.token) {
+        localStorage.setItem("token", d.token);
+        localStorage.setItem("role", d.role || "user");
+        localStorage.setItem("username", d.username || "testuser2");
+        window.location.reload();
+      } else {
+        window.location.href = "login.html";
+      }
+    })
+    .catch(() => {
+      window.location.href = "login.html";
+    });
+  } else if (!token) {
+    window.location.href = "login.html";
+  }
+
+  // Theme Functions
+  function togglePortalTheme() {
+    const isLight = document.body.classList.contains("theme-light");
+    const nextTheme = isLight ? "dark" : "light";
+    applyPortalTheme(nextTheme);
+  }
+  window.togglePortalTheme = togglePortalTheme;
+
+  function applyPortalTheme(theme) {
+    const icon = document.getElementById("theme-toggle-icon");
+    const text = document.getElementById("theme-toggle-text");
+    if (theme === "light") {
+      document.body.classList.add("theme-light");
+      if (icon) icon.innerText = "☀️";
+      if (text) text.innerText = "Daylight";
+    } else {
+      document.body.classList.remove("theme-light");
+      if (icon) icon.innerText = "🌙";
+      if (text) text.innerText = "Midnight";
+    }
+    localStorage.setItem("dinescout_portal_theme", theme);
+  }
+  window.applyPortalTheme = applyPortalTheme;
+
+  window.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("role") === "admin") {
+      const al = document.getElementById("nav-admin-link");
+      if (al) al.style.display = "inline-flex";
+    }
+    const uname = localStorage.getItem("username") || "Diner";
+    const uLabel = document.getElementById("nav-username-label");
+    if (uLabel) uLabel.innerText = uname;
+
+    const savedTheme = localStorage.getItem("dinescout_portal_theme") || "dark";
+    applyPortalTheme(savedTheme);
+  });
+</script>
+
+<!-- ================= NAVBAR ================= -->
+<div class="navbar">
+  <div class="brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    <span class="brand-icon">🔥</span>
+    <h2>Dine<span>Scout</span></h2>
+    <span class="brand-tag">AI Concierge</span>
+  </div>
+
+  <div class="nav-actions">
+    <a href="owner-dashboard.html" class="nav-link-btn nav-link-owner">
+      <span>📊</span> Owner Dashboard
+    </a>
+    <a href="admin.html" id="nav-admin-link" class="nav-link-btn nav-link-admin" style="display:none;">
+      <span>🛡️</span> Admin Portal
+    </a>
+    
+    <!-- Theme Switcher Button -->
+    <button id="theme-toggle-btn" class="theme-toggle-btn" onclick="togglePortalTheme()" title="Switch Theme (Midnight / Daylight)">
+      <span id="theme-toggle-icon">🌙</span>
+      <span id="theme-toggle-text">Midnight</span>
+    </button>
+
+    <!-- User Profile Pill -->
+    <div class="user-pill">
+      <span>👤</span>
+      <span id="nav-username-label">Diner</span>
+    </div>
+
+    <!-- Notification Bell -->
+    <div class="notif-bell-wrapper" onclick="toggleNotifDropdown()" title="Notifications">
+      <span class="notif-bell-icon">🔔</span>
+      <span id="notif-badge" class="notif-badge-count" style="display:none;">0</span>
+    </div>
+    
+    <!-- Notification Dropdown -->
+    <div id="notif-dropdown">
+      <div class="notif-header">
+        <span>Notifications</span>
+        <button onclick="markAllNotifsRead()" style="background:none; border:none; color:#38bdf8; font-size:12px; font-weight:600; cursor:pointer;">Mark all read</button>
+      </div>
+      <div id="notif-list" class="notif-list-container">
+        <div style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">Loading notifications...</div>
+      </div>
+    </div>
+
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container" style="position: fixed; top: 84px; right: 28px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;"></div>
+
+<!-- ================= MAIN CONTAINER ================= -->
+<div class="main-wrapper">
+
+  <!-- HERO CONCIERGE BANNER -->
+  <div class="hero-container">
+    <div class="hero-badge">✨ AI-Powered Dining Concierge</div>
+    <h1 class="hero-title">Discover Bangalore's Finest Dining. <span>Decoded by AI.</span></h1>
+    <p class="hero-subtitle">Vibe-matched recommendations, authentic sentiment analysis, and signature dishes across 2,400+ curated spots</p>
+
+    <!-- FLOATING CONCIERGE SEARCH CAPSULE -->
+    <div class="search-capsule" id="hero-search-capsule">
+      <div class="search-row">
+        <input
+          type="text"
+          id="mood-query"
+          class="search-input-field"
+          placeholder="✨ What vibe or craving? e.g. romantic rooftop, peaceful cafe to work, late night pizza..."
+          onkeydown="if(event.key==='Enter') searchByMood()"
+        />
+
+        <select id="mood-locality" class="search-input-field" style="cursor: pointer;">
+          <option value="">📍 All Bangalore</option>
+          <option value="Koramangala">📍 Koramangala</option>
+          <option value="Indiranagar">📍 Indiranagar</option>
+          <option value="HSR Layout">📍 HSR Layout</option>
+          <option value="Whitefield">📍 Whitefield</option>
+          <option value="Lavelle Road">📍 Lavelle Road</option>
+          <option value="Church Street">📍 Church Street / MG Road</option>
+          <option value="Jayanagar">📍 Jayanagar</option>
+          <option value="Kengeri">📍 Kengeri</option>
+        </select>
+
+        <input
+          type="number"
+          id="mood-budget"
+          class="search-input-field"
+          placeholder="💰 Max ₹ Budget"
+          onkeydown="if(event.key==='Enter') searchByMood()"
+        />
+
+        <button class="search-btn-cta" id="btn-search-mood" onclick="searchByMood()">
+          <span>🔍 Find Tables</span>
+        </button>
+      </div>
+
+      <!-- Quick Mood Chips -->
+      <div class="vibe-pills-row">
+        <span class="vibe-chip" id="chip-romantic" onclick="selectMoodChip('romantic place for a first date')">🌹 Romantic First Date</span>
+        <span class="vibe-chip" onclick="selectMoodChip('cozy quiet cafe to work with laptop')">💻 Quiet Work Cafe</span>
+        <span class="vibe-chip" onclick="selectMoodChip('cheap delicious budget food with friends')">🌮 Street Bites & Budget</span>
+        <span class="vibe-chip" onclick="selectMoodChip('party drinks and craft cocktails with music')">🍸 Craft Cocktails & Nightlife</span>
+        <span class="vibe-chip" onclick="selectMoodChip('family friendly dinner with north indian food')">👨‍👩‍👧 Family Celebrations</span>
+        <span class="vibe-chip" onclick="selectMoodChip('healthy salads and organic fresh food')">🥗 Healthy & Fresh</span>
+        <span class="vibe-chip" onclick="selectMoodChip('luxury hotel fine dining and wine')">🏨 Luxury Fine Dine</span>
+        <span class="vibe-chip" onclick="selectMoodChip('late night woodfired pizza and burgers')">🍕 Late Night Pizza</span>
+      </div>
+
+      <!-- Stats Strip -->
+      <div class="stats-strip">
+        <div class="stats-item"><span class="icon">✨</span> 2,400+ Curated Spots in Bangalore</div>
+        <div class="stats-item"><span class="icon">🤖</span> 98.4% AI Match Accuracy</div>
+        <div class="stats-item"><span class="icon">📍</span> Live Footfall & Distance Routing</div>
+        <div class="stats-item"><span class="icon">🛡️</span> Anti-Spam Verified Reviews</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING NAVIGATION TABS DOCK -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-mood" onclick="switchTab('mood')">
+      <span>✨ Vibe Search</span>
+    </button>
+    <button class="tab-btn" id="tab-location" onclick="switchTab('location')">
+      <span>📍 Locality & Cuisine</span>
+    </button>
+    <button class="tab-btn" id="tab-dishes" onclick="switchTab('dishes')">
+      <span>🍲 Signature Dishes</span>
+    </button>
+    <button class="tab-btn" id="tab-saved" onclick="switchTab('saved')">
+      <span>❤️ My Saved Places</span>
+    </button>
+    <button class="tab-btn" id="tab-offers" onclick="switchTab('offers')">
+      <span>🎁 Active Offers & Deals</span>
+    </button>
+  </div>
+
+  <!-- SECONDARY PANEL 2: LOCATION & CUISINE SEARCH -->
+  <div class="search-panel" id="panel-location" style="display: none;">
+    <h3>📍 Filter by Cuisine & Distance</h3>
+    <p class="sub">Find nearby dining destinations sorted by proximity and Michelin-level standards</p>
+
+    <div class="search-row">
+      <input
+        type="text"
+        id="cuisine"
+        class="search-input-field"
+        placeholder="Enter cuisine (e.g. Italian, North Indian, Pan-Asian, Cafe, Continental)"
+        onkeydown="if(event.key==='Enter') getLocation()"
+      />
+      <input
+        type="number"
+        id="budget"
+        class="search-input-field"
+        placeholder="Budget (Optional)"
+      />
+      <button class="search-btn-cta" onclick="getLocation()">
+        <span>📍 Search Nearby</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- SECONDARY PANEL 3: TOP DISHES EXPLORER -->
+  <div class="search-panel" id="panel-dishes" style="display: none;">
+    <h3>🍲 Signature Dish Recommendations</h3>
+    <p class="sub">Discover top rated signature dishes and where to experience them across Bangalore</p>
+
+    <div class="search-row">
+      <input
+        type="text"
+        id="dish-cuisine"
+        class="search-input-field"
+        placeholder="Filter by dish or cuisine (e.g. Butter Chicken, Truffle Pasta, Biryani, Pizza)"
+        onkeydown="if(event.key==='Enter') loadDishRecommendations()"
+      />
+      <input
+        type="number"
+        id="dish-max-price"
+        class="search-input-field"
+        placeholder="Max Price ₹"
+      />
+      <button class="search-btn-cta" onclick="loadDishRecommendations()">
+        <span>✨ Explore Dishes</span>
+      </button>
+    </div>
+
+    <div style="margin-top: 18px;">
+      <div style="font-size: 13px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px;">🧬 Filter by Flavor DNA Profile:</div>
+      <div class="vibe-pills-row" style="justify-content: flex-start;">
+        <button class="vibe-chip" onclick="searchFlavorDNA('spicy')">🔥 Spicy</button>
+        <button class="vibe-chip" onclick="searchFlavorDNA('creamy')">🧀 Creamy</button>
+        <button class="vibe-chip" onclick="searchFlavorDNA('tangy')">🍋 Tangy</button>
+        <button class="vibe-chip" onclick="searchFlavorDNA('smoky')">🍖 Smoky / Tandoori</button>
+        <button class="vibe-chip" onclick="searchFlavorDNA('sweet')">🍰 Sweet</button>
+        <button class="vibe-chip" onclick="searchFlavorDNA('crispy')">🍿 Crispy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECONDARY PANEL 4: MY SAVED -->
+  <div class="search-panel" id="panel-saved" style="display: none;">
+    <h3>❤️ My Saved Restaurants</h3>
+    <p class="sub">Your hand-picked collection of favorites for upcoming dining plans.</p>
+    <button class="search-btn-cta" onclick="loadFavorites()">🔄 Refresh Saved</button>
+  </div>
+
+  <!-- SECONDARY PANEL 5: OFFERS & DEALS -->
+  <div class="search-panel" id="panel-offers" style="display: none;">
+    <h3>🎁 Exclusive Deals & Special Offers</h3>
+    <p class="sub">Perks, discounts, and culinary events shared by restaurant owners directly to DineScout diners.</p>
+    <button class="search-btn-cta" onclick="loadOffers()">🔄 Refresh Offers</button>
+  </div>
+
+  <!-- FEED HEADER TOOLBAR -->
+  <div class="feed-toolbar" id="feed-toolbar">
+    <div class="feed-title-block">
+      <h3 id="feed-main-title">🔥 Featured & Trending Spots in Bangalore</h3>
+      <p id="feed-sub-title">Top 20 destinations ranked by real diner sentiment, authentic reviews, and value scores</p>
+    </div>
+    <div class="filter-pills-group">
+      <button class="filter-pill active" id="pill-all" onclick="filterCurrentResults('all')">All</button>
+      <button class="filter-pill" id="pill-rating" onclick="filterCurrentResults('rating')">⭐ Top Rated (4.2+)</button>
+      <button class="filter-pill" id="pill-budget" onclick="filterCurrentResults('budget')">💸 Under ₹1000</button>
+      <button class="filter-pill" id="pill-luxury" onclick="filterCurrentResults('luxury')">💎 Luxury Dining</button>
+      <button class="map-toggle-pill" id="btn-toggle-map" onclick="toggleMapVisibility()">🗺️ Toggle Map</button>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE LEAFLET MAP CONTAINER (Collapsible) -->
+  <div id="interactive-map-container" style="display: none;">
+    <div class="map-header">
+      <span class="title">
+        📍 Real-Time Bangalore Culinary Map
+      </span>
+      <span id="map-counter"></span>
+    </div>
+    <div id="map"></div>
+  </div>
+
+  <!-- RESULTS GRID -->
+  <div id="results"></div>
+
+</div>
+
+<!-- ================= AI REVIEW SUMMARY MODAL (Feature 2) ================= -->
+<div class="modal-overlay" id="review-modal" onclick="if(event.target===this) closeReviewModal()">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeReviewModal()">✕</button>
+    <div id="modal-content">
+      <p style="color:var(--text-muted); text-align:center; padding:30px;">Loading AI review summary...</p>
+    </div>
+  </div>
+</div>
+
+<!-- Push Notification Alert Sound (Swiggy / Phone Message alert) -->
+<audio id="push-notification-audio" src="notification.wav" preload="auto"></audio>
+
+<!-- AI Chatbot Widget -->
+<link rel="stylesheet" href="ChatWidget/chat-widget.css">
+<script src="ChatWidget/chat-widget.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>

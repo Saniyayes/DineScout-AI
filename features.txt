@@ -1,0 +1,33 @@
+DineScout AI - Restaurant Recommendation & Business Analysis System
+=====================================================================
+
+IMPLEMENTED CORE FEATURES
+---------------------------
+1. Authentication & Role Management - JWT-based login, registration, and OTP verification supporting diner and owner access levels.
+2. Location & Cuisine Search - Nearby restaurant discovery with Haversine distance calculations, cuisine filtering, and budget limits.
+3. Owner Market Feasibility Analysis - City and cuisine demand evaluation displaying average pricing, diner votes, and competitor counts.
+4. Navigation & Directions Integration - One-click Google Maps directions using geographic latitude and longitude coordinates.
+5. MongoDB Dataset Integration - Scalable MongoDB database storing Zomato restaurant data, reviews, signature dishes, and localities.
+
+BATCH 1 FEATURES (FEATURES 1 - 7)
+----------------------------------
+1. Mood/Occasion-based restaurant search - Natural language vibe query matching for romantic dates, quiet work cafes, party spots, and family dinners.
+2. AI-generated review summarization (pros/cons) - Automated diner sentiment aggregation extracting top strengths, key complaints, and dining verdicts.
+3. Value-for-money score based on price vs rating/portion mentions - Cost-to-rating efficiency score (1.0-10.0 scale) with dynamic value badges.
+4. Owner dashboard: competitor benchmarking (rating/pricing comparison by cuisine and location) - Direct market positioning comparison against city averages and top performers.
+5. Owner dashboard: review-to-action insights (keyword-based negative review analysis with suggestions) - Customer friction point detection mapped to prioritized business actions and ROI impact.
+6. Menu/dish-level recommendations across restaurants - Signature dish discovery engine highlighting top rated items, average pricing, and top restaurants.
+7. Persistent AI Chatbot Widget - Floating conversational assistant supporting NLU search, follow-up refinements, owner analytics, and inline compact cards.
+
+BATCH 2 ADVANCED FEATURES (FEATURES 1 - 10)
+---------------------------------------------
+1. Review Authenticity / Spam Scoring - Statistical rule engine detecting review bursts, templated text phrasing, and assigning High/Medium/Low trust scores.
+2. Voice-Note Review Parsing - Voice-to-text transcript submission with automatic sentiment analysis, rating inference, and voice-sourced tagging.
+3. Time-Machine Pricing Trends - Historical price/rating snapshotting in time-series collection with drift percentage trend indicators.
+4. Dish DNA (Flavor Profile Matcher) - Flavor profile tagging (spicy, creamy, tangy, smoky, sweet) and Jaccard flavor profile similarity matching.
+5. Local Food Trend Detector - Aggregates review timestamps and search filters to surface rising cuisines and dishes per city/locality.
+6. Regret Radar Mismatch Warnings - Personalized soft warning annotations highlighting skipped/disliked diner flavor preferences.
+7. Second-Visit Loyalty Tracker - Computes repeat diner return rates (% of diners who come back) and surfaces secondary return badges.
+8. Group Budget Splitter + Venue Matcher - Shareable group session codes with individual budget ceilings and multi-member venue matching.
+9. Owner "Ghost Customer" Simulation - LLM-driven UX audit report simulating first-time diner pre-arrival, in-session, and post-visit journeys.
+10. "What Changed" Competitor Alerts - Threshold-based alert engine detecting competitor price under-cuts, rating crossovers, and sending notifications.

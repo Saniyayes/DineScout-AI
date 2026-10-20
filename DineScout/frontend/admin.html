@@ -1,0 +1,2282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DineScout - Super Admin Console & Platform Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js for Admin Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary: #f97316;
+      --primary-hover: #ea580c;
+      --primary-soft: rgba(249, 115, 22, 0.12);
+      --admin-purple: #8b5cf6;
+      --admin-purple-dark: #6d28d9;
+      --admin-purple-soft: rgba(139, 92, 246, 0.12);
+      --bg-dark: #0b1120;
+      --sidebar-bg: #0f172a;
+      --header-bg: #0f172a;
+      --content-bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --border-dark: rgba(255, 255, 255, 0.08);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 20px 40px -15px rgba(15, 23, 42, 0.14);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--content-bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Accent Line */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #8b5cf6, #f97316, #06b6d4, #8b5cf6);
+      z-index: 9999;
+    }
+
+    /* ================= TOP NAVBAR ================= */
+    .admin-navbar {
+      background: var(--header-bg);
+      color: white;
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-dark);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-section h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .brand-section h1 span.glow {
+      color: var(--primary);
+    }
+
+    .admin-pill {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(249, 115, 22, 0.2) 100%);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: #c084fc;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .portal-link {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .portal-link:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .admin-user-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 30px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .admin-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6, #f97316);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .logout-btn {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      background: #ef4444;
+      color: white;
+      border-color: #ef4444;
+    }
+
+    /* ================= MAIN LAYOUT ================= */
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      flex-grow: 1;
+      min-height: calc(100vh - 61px);
+    }
+
+    /* ================= SIDEBAR ================= */
+    .admin-sidebar {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-dark);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar-menu-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: #94a3b8;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-item.active {
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(249, 115, 22, 0.15) 100%);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-item .icon {
+      font-size: 17px;
+      width: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-footer {
+      padding: 14px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-md);
+      font-size: 11.5px;
+      color: #64748b;
+    }
+
+    .sidebar-footer .status-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-footer .status-val {
+      color: #4ade80;
+      font-weight: 600;
+    }
+
+    /* ================= MAIN CONTENT AREA ================= */
+    .admin-main {
+      padding: 32px;
+      overflow-y: auto;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .tab-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .section-header h2 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 13.5px;
+      margin-top: 2px;
+    }
+
+    /* ================= STAT CARDS ================= */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .stat-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+      border-color: #cbd5e1;
+    }
+
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .stat-card.purple::before { background: #8b5cf6; }
+    .stat-card.emerald::before { background: #10b981; }
+    .stat-card.blue::before { background: #0284c7; }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .stat-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      background: #f1f5f9;
+    }
+
+    .stat-value {
+      font-size: 30px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.8px;
+      line-height: 1.1;
+    }
+
+    .stat-subtext {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ================= CHARTS SECTION ================= */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .chart-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chart-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .chart-card p.chart-sub {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 250px;
+      width: 100%;
+    }
+
+    /* ================= CARDS & TABLES ================= */
+    .content-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .table-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      max-width: 450px;
+    }
+
+    .admin-input, .admin-select {
+      width: 100%;
+      padding: 9px 14px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .admin-input:focus, .admin-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
+    .btn-admin {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-admin:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-admin.purple {
+      background: #8b5cf6;
+    }
+
+    .btn-admin.purple:hover {
+      background: #7c3aed;
+    }
+
+    .btn-admin.outline {
+      background: transparent;
+      color: #475569;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-admin.outline:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    /* Table styles */
+    .admin-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    .admin-table th {
+      background: #f8fafc;
+      padding: 12px 16px;
+      font-weight: 700;
+      color: #475569;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-size: 11.5px;
+      letter-spacing: 0.5px;
+    }
+
+    .admin-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #1e293b;
+      vertical-align: middle;
+    }
+
+    .admin-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .admin-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* Badges */
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .role-badge.user {
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+    }
+
+    .role-badge.owner {
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #fed7aa;
+    }
+
+    .role-badge.admin {
+      background: #f5f3ff;
+      color: #7c3aed;
+      border: 1px solid #ddd6fe;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .status-badge.verified {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .status-badge.unverified {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .action-btn.delete {
+      color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .action-btn.delete:hover {
+      background: #fee2e2;
+    }
+
+    .action-btn.audit {
+      color: #8b5cf6;
+      background: #f5f3ff;
+    }
+
+    .action-btn.audit:hover {
+      background: #ede9fe;
+    }
+
+    .action-btn.edit {
+      color: #0284c7;
+      background: #f0f9ff;
+    }
+
+    .action-btn.edit:hover {
+      background: #e0f2fe;
+    }
+
+    /* Pagination */
+    .pagination-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .page-btn {
+      padding: 6px 12px;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .page-btn:not(:disabled):hover {
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    /* ================= MODAL DIALOGS ================= */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 540px;
+      padding: 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: #94a3b8;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: white;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      font-size: 13.5px;
+      font-weight: 600;
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      animation: toastIn 0.3s ease;
+    }
+
+    @keyframes toastIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ================= LOGIN OVERLAY IF NOT AUTHENTICATED ================= */
+    #auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0b1120 70%);
+      z-index: 99999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .auth-overlay-card {
+      background: rgba(30, 41, 59, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 36px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .auth-overlay-card h2 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .auth-overlay-card p {
+      font-size: 13.5px;
+      color: #94a3b8;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .admin-layout {
+        grid-template-columns: 1fr;
+      }
+      .admin-sidebar {
+        display: none;
+      }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= TOP NAVIGATION ================= -->
+  <header class="admin-navbar">
+    <div class="brand-section">
+      <h1>Dine<span class="glow">Scout</span></h1>
+      <span class="admin-pill">
+        <span class="status-dot"></span>
+        Admin Console
+      </span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="index.html" class="portal-link">🍽️ Diner Portal</a>
+      <a href="owner-dashboard.html" class="portal-link">📊 Owner Portal</a>
+      
+      <div class="admin-user-badge">
+        <div class="admin-avatar" id="header-avatar">A</div>
+        <span id="header-username">Admin</span>
+      </div>
+
+      <button class="logout-btn" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- ================= MAIN LAYOUT ================= -->
+  <div class="admin-layout">
+    
+    <!-- Left Navigation Sidebar -->
+    <aside class="admin-sidebar">
+      <div>
+        <div class="sidebar-menu-label">Console Modules</div>
+        <nav class="sidebar-nav">
+          <button class="nav-item active" id="admin-tab-btn-overview" onclick="switchAdminTab('overview')">
+            <span class="icon">📊</span>
+            <span>Platform Overview</span>
+          </button>
+          <button class="nav-item" id="admin-tab-btn-users" onclick="switchAdminTab('users')">
+            <span class="icon">👥</span>
+            <span>Users & Access</span>
+          </button>
+          <button class="nav-item" id="admin-tab-btn-restaurants" onclick="switchAdminTab('restaurants')">
+            <span class="icon">🍽️</span>
+            <span>Restaurant Catalog</span>
+          </button>
+          <button class="nav-item" id="admin-tab-btn-reviews" onclick="switchAdminTab('reviews')">
+            <span class="icon">⭐</span>
+            <span>Review Moderation</span>
+          </button>
+          <button class="nav-item" id="admin-tab-btn-broadcasts" onclick="switchAdminTab('broadcasts')">
+            <span class="icon">📢</span>
+            <span>Platform Broadcasts</span>
+          </button>
+          <button class="nav-item" id="admin-tab-btn-system" onclick="switchAdminTab('system')">
+            <span class="icon">⚡</span>
+            <span>System Health</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Live Health Footer -->
+      <div class="sidebar-footer">
+        <div class="status-row">
+          <span>Backend API</span>
+          <span class="status-val">Port 5000 Active</span>
+        </div>
+        <div class="status-row">
+          <span>Database</span>
+          <span class="status-val">MongoDB Connected</span>
+        </div>
+        <div class="status-row" style="margin-bottom:0;">
+          <span>Live SSE Dispatch</span>
+          <span class="status-val">Operational</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Tab Panes -->
+    <main class="admin-main">
+
+      <!-- ================= 1. PLATFORM OVERVIEW TAB ================= -->
+      <section id="tab-overview" class="tab-section active">
+        <div class="section-header">
+          <div>
+            <h2>Platform Overview & Analytics</h2>
+            <p>Live metrics across users, restaurant catalogs, reviews, and notifications</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-admin outline" onclick="loadOverviewStats()">🔄 Refresh</button>
+            <button class="btn-admin purple" onclick="openBroadcastModal()">📢 Quick Broadcast</button>
+          </div>
+        </div>
+
+        <!-- 4 Key Stat Cards -->
+        <div class="stats-grid">
+          <div class="stat-card purple">
+            <div class="stat-top">
+              <span class="stat-title">Total Users</span>
+              <div class="stat-icon">👥</div>
+            </div>
+            <div class="stat-value" id="stat-total-users">--</div>
+            <div class="stat-subtext" id="stat-user-breakdown">Loading accounts...</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-top">
+              <span class="stat-title">Restaurants</span>
+              <div class="stat-icon">🍽️</div>
+            </div>
+            <div class="stat-value" id="stat-total-restaurants">--</div>
+            <div class="stat-subtext" id="stat-restaurants-sub">Across top metros</div>
+          </div>
+
+          <div class="stat-card emerald">
+            <div class="stat-top">
+              <span class="stat-title">Platform Reviews</span>
+              <div class="stat-icon">⭐</div>
+            </div>
+            <div class="stat-value" id="stat-total-reviews">--</div>
+            <div class="stat-subtext" id="stat-avg-rating">Avg Rating: -- ★</div>
+          </div>
+
+          <div class="stat-card blue">
+            <div class="stat-top">
+              <span class="stat-title">Active Broadcasts</span>
+              <div class="stat-icon">📢</div>
+            </div>
+            <div class="stat-value" id="stat-total-notifications">--</div>
+            <div class="stat-subtext">System alerts dispatched</div>
+          </div>
+        </div>
+
+        <!-- Interactive Charts -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>User Role Distribution</h3>
+            <p class="chart-sub">Breakdown of Diners, Restaurant Owners, and Administrators</p>
+            <div class="chart-container">
+              <canvas id="userRolesChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3>Top Restaurant Hubs</h3>
+            <p class="chart-sub">Density of verified listings across key cities</p>
+            <div class="chart-container">
+              <canvas id="cityDistChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Signups & Recent Reviews Rows -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+          <div class="content-card">
+            <h3 style="font-size:16px; font-weight:700; margin-bottom:14px;">Recent User Registrations</h3>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-users-body">
+                  <tr><td colspan="3" style="text-align:center;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="content-card">
+            <h3 style="font-size:16px; font-weight:700; margin-bottom:14px;">Recent Feedback & Reviews</h3>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Restaurant</th>
+                    <th>Rating</th>
+                    <th>Reviewer</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-reviews-body">
+                  <tr><td colspan="3" style="text-align:center;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. USERS MANAGEMENT TAB ================= -->
+      <section id="tab-users" class="tab-section">
+        <div class="section-header">
+          <div>
+            <h2>User Account Management</h2>
+            <p>Control user roles, view registration details, toggle verification, and manage accounts</p>
+          </div>
+          <button class="btn-admin" onclick="openCreateUserModal()">+ Add New User</button>
+        </div>
+
+        <div class="content-card">
+          <!-- Filter & Search Toolbar -->
+          <div class="table-toolbar">
+            <div class="search-input-group">
+              <input type="text" id="user-search-input" class="admin-input" placeholder="Search by username or email..." oninput="debounceUserSearch()" />
+              <select id="user-role-filter" class="admin-select" style="max-width: 150px;" onchange="loadUsers(1)">
+                <option value="">All Roles</option>
+                <option value="user">Diners (user)</option>
+                <option value="owner">Owners (owner)</option>
+                <option value="admin">Admins (admin)</option>
+              </select>
+            </div>
+            <div>
+              <span id="user-count-display" style="font-size:13px; color:var(--text-muted); font-weight:600;">Showing 0 users</span>
+            </div>
+          </div>
+
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>User Details</th>
+                  <th>Email</th>
+                  <th>Current Role</th>
+                  <th>Verification</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <tr><td colspan="5" style="text-align:center;">Loading user directory...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="pagination-bar">
+            <span id="user-page-info">Page 1 of 1</span>
+            <div class="pagination-controls">
+              <button class="page-btn" id="user-prev-btn" onclick="changeUserPage(-1)">← Previous</button>
+              <button class="page-btn" id="user-next-btn" onclick="changeUserPage(1)">Next →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. RESTAURANT CATALOG TAB ================= -->
+      <section id="tab-restaurants" class="tab-section">
+        <div class="section-header">
+          <div>
+            <h2>Restaurant Catalog & Intelligence</h2>
+            <p>Search, create, update, or run AI spam & authenticity audits across listings</p>
+          </div>
+          <button class="btn-admin" onclick="openAddRestaurantModal()">+ Add Restaurant</button>
+        </div>
+
+        <div class="content-card">
+          <div class="table-toolbar">
+            <div class="search-input-group">
+              <input type="text" id="rest-search-input" class="admin-input" placeholder="Search by name, cuisine, locality..." oninput="debounceRestSearch()" />
+              <select id="rest-city-filter" class="admin-select" style="max-width: 160px;" onchange="loadRestaurants(1)">
+                <option value="">All Cities</option>
+              </select>
+            </div>
+            <div>
+              <span id="rest-count-display" style="font-size:13px; color:var(--text-muted); font-weight:600;">Showing 0 restaurants</span>
+            </div>
+          </div>
+
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Restaurant & City</th>
+                  <th>Cuisines</th>
+                  <th>Rating & Cost</th>
+                  <th>AI Authenticity Score</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="restaurants-table-body">
+                <tr><td colspan="5" style="text-align:center;">Loading restaurant directory...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-bar">
+            <span id="rest-page-info">Page 1 of 1</span>
+            <div class="pagination-controls">
+              <button class="page-btn" id="rest-prev-btn" onclick="changeRestPage(-1)">← Previous</button>
+              <button class="page-btn" id="rest-next-btn" onclick="changeRestPage(1)">Next →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. REVIEW MODERATION TAB ================= -->
+      <section id="tab-reviews" class="tab-section">
+        <div class="section-header">
+          <div>
+            <h2>Customer Reviews & Content Moderation</h2>
+            <p>Monitor diner ratings, feedback sentiment, and remove inappropriate or spam reviews</p>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="table-toolbar">
+            <div class="search-input-group">
+              <input type="text" id="review-search-input" class="admin-input" placeholder="Search by restaurant, diner, or keyword..." oninput="debounceReviewSearch()" />
+              <select id="review-rating-filter" class="admin-select" style="max-width: 140px;" onchange="loadReviews(1)">
+                <option value="">All Ratings</option>
+                <option value="5">5 Stars ★</option>
+                <option value="4">4 Stars ★</option>
+                <option value="3">3 Stars ★</option>
+                <option value="2">2 Stars ★</option>
+                <option value="1">1 Star ★</option>
+              </select>
+            </div>
+            <span id="review-count-display" style="font-size:13px; color:var(--text-muted); font-weight:600;">0 reviews</span>
+          </div>
+
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Restaurant</th>
+                  <th>Rating</th>
+                  <th>Reviewer</th>
+                  <th>Feedback Text</th>
+                  <th>Date</th>
+                  <th style="text-align:right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="reviews-table-body">
+                <tr><td colspan="6" style="text-align:center;">Loading reviews...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-bar">
+            <span id="review-page-info">Page 1 of 1</span>
+            <div class="pagination-controls">
+              <button class="page-btn" id="review-prev-btn" onclick="changeReviewPage(-1)">← Previous</button>
+              <button class="page-btn" id="review-next-btn" onclick="changeReviewPage(1)">Next →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. BROADCASTS & NOTIFICATIONS TAB ================= -->
+      <section id="tab-broadcasts" class="tab-section">
+        <div class="section-header">
+          <div>
+            <h2>Platform Broadcasts & Announcements</h2>
+            <p>Push real-time system alerts, updates, and promotions directly to diners and owners</p>
+          </div>
+          <button class="btn-admin purple" onclick="openBroadcastModal()">+ Dispatch New Broadcast</button>
+        </div>
+
+        <div class="content-card">
+          <h3 style="font-size:16px; font-weight:700; margin-bottom:14px;">Broadcast History & Active Campaigns</h3>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Audience</th>
+                  <th>Delivered</th>
+                  <th>Date Dispatched</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="broadcasts-table-body">
+                <tr><td colspan="6" style="text-align:center;">Loading notifications...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 6. SYSTEM HEALTH TAB ================= -->
+      <section id="tab-system" class="tab-section">
+        <div class="section-header">
+          <div>
+            <h2>System Health & Diagnostics</h2>
+            <p>Server parameters, MongoDB connectivity, and administrative controls</p>
+          </div>
+          <button class="btn-admin outline" onclick="runQuickSeed()">⚡ Ensure Admin Account</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+          <div class="content-card">
+            <h3 style="font-size:16px; font-weight:700; margin-bottom:14px;">Environment Parameters</h3>
+            <div style="display:flex; flex-direction:column; gap:12px; font-size:13.5px;">
+              <div style="display:flex; justify-content:space-between; padding-bottom:8px; border-bottom:1px solid #f1f5f9;">
+                <span style="color:var(--text-muted); font-weight:600;">Node.js API Server</span>
+                <span style="font-weight:700; color:#10b981;">Online (Port 5000)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding-bottom:8px; border-bottom:1px solid #f1f5f9;">
+                <span style="color:var(--text-muted); font-weight:600;">Database Engine</span>
+                <span style="font-weight:700; color:#10b981;">MongoDB (Active)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding-bottom:8px; border-bottom:1px solid #f1f5f9;">
+                <span style="color:var(--text-muted); font-weight:600;">SSE Notification Stream</span>
+                <span style="font-weight:700; color:#10b981;">Enabled (/api/notifications/events)</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding-bottom:8px; border-bottom:1px solid #f1f5f9;">
+                <span style="color:var(--text-muted); font-weight:600;">Security Strategy</span>
+                <span style="font-weight:700; color:#8b5cf6;">JWT Authentication + Role Guards</span>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--text-muted); font-weight:600;">AI Engine</span>
+                <span style="font-weight:700; color:#f97316;">Review Sentiment & Spam Scorer</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-card">
+            <h3 style="font-size:16px; font-weight:700; margin-bottom:14px;">Quick Admin Actions</h3>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <p style="font-size:13px; color:var(--text-muted);">Perform operational maintenance tasks directly from this terminal.</p>
+              
+              <button class="btn-admin outline" onclick="loadOverviewStats()" style="justify-content:center;">
+                🔄 Reload System Aggregates
+              </button>
+
+              <button class="btn-admin purple" onclick="openBroadcastModal()" style="justify-content:center;">
+                📢 Send Platform Alert
+              </button>
+
+              <button class="btn-admin" onclick="openCreateUserModal()" style="justify-content:center;">
+                👥 Register New Administrator
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. CREATE USER MODAL -->
+  <div class="modal-backdrop" id="modal-create-user">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Create New User Account</h3>
+        <button class="modal-close" onclick="closeModal('modal-create-user')">&times;</button>
+      </div>
+      <div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="new-user-name" class="admin-input" placeholder="e.g. john_diner" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="new-user-email" class="admin-input" placeholder="e.g. john@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="new-user-pass" class="admin-input" placeholder="Create account password" />
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="new-user-role" class="admin-select">
+            <option value="user">User / Diner</option>
+            <option value="owner">Restaurant Owner</option>
+            <option value="admin">Administrator</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-admin outline" onclick="closeModal('modal-create-user')">Cancel</button>
+        <button class="btn-admin" onclick="submitCreateUser()">Create User</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ADD/EDIT RESTAURANT MODAL -->
+  <div class="modal-backdrop" id="modal-restaurant">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-rest-title">Add New Restaurant</h3>
+        <button class="modal-close" onclick="closeModal('modal-restaurant')">&times;</button>
+      </div>
+      <input type="hidden" id="edit-rest-id" />
+      <div>
+        <div class="form-group">
+          <label>Restaurant Name *</label>
+          <input type="text" id="rest-form-name" class="admin-input" placeholder="e.g. The Truffle Bistro" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City *</label>
+            <input type="text" id="rest-form-city" class="admin-input" placeholder="e.g. Bangalore" />
+          </div>
+          <div class="form-group">
+            <label>Locality</label>
+            <input type="text" id="rest-form-locality" class="admin-input" placeholder="e.g. Indiranagar" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Cuisines (comma separated)</label>
+          <input type="text" id="rest-form-cuisines" class="admin-input" placeholder="e.g. Italian, Continental, Cafe" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Avg Cost for Two (₹)</label>
+            <input type="number" id="rest-form-cost" class="admin-input" placeholder="800" />
+          </div>
+          <div class="form-group">
+            <label>Rating (1.0 - 5.0)</label>
+            <input type="number" id="rest-form-rating" step="0.1" min="1" max="5" class="admin-input" placeholder="4.2" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Latitude</label>
+            <input type="number" step="any" id="rest-form-lat" class="admin-input" placeholder="12.9716" />
+          </div>
+          <div class="form-group">
+            <label>Longitude</label>
+            <input type="number" step="any" id="rest-form-lon" class="admin-input" placeholder="77.5946" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-admin outline" onclick="closeModal('modal-restaurant')">Cancel</button>
+        <button class="btn-admin" onclick="submitRestaurantForm()">Save Restaurant</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. BROADCAST MODAL -->
+  <div class="modal-backdrop" id="modal-broadcast">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Dispatch Platform Broadcast</h3>
+        <button class="modal-close" onclick="closeModal('modal-broadcast')">&times;</button>
+      </div>
+      <div>
+        <div class="form-group">
+          <label>Broadcast Title *</label>
+          <input type="text" id="broadcast-title" class="admin-input" placeholder="e.g. DineScout Weekend Food Carnival!" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Notification Type</label>
+            <select id="broadcast-type" class="admin-select">
+              <option value="Announcement">Announcement</option>
+              <option value="Offer">Special Offer</option>
+              <option value="Event">Live Event</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Target Audience</label>
+            <select id="broadcast-audience" class="admin-select">
+              <option value="All">All Registered Users</option>
+              <option value="Diners">Diners Only</option>
+              <option value="Owners">Restaurant Owners Only</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Message Content *</label>
+          <textarea id="broadcast-msg" class="admin-input" rows="4" placeholder="Enter message text sent to user devices..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-admin outline" onclick="closeModal('modal-broadcast')">Cancel</button>
+        <button class="btn-admin purple" onclick="submitBroadcast()">🚀 Send Broadcast</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AUTH OVERLAY (IF NOT LOGGED IN AS ADMIN) ================= -->
+  <div id="auth-overlay">
+    <div class="auth-overlay-card">
+      <div style="font-size: 38px; margin-bottom: 12px;">🛡️</div>
+      <h2>Administrator Access Required</h2>
+      <p>This console is restricted to DineScout platform administrators. Please authenticate with admin credentials.</p>
+      
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button class="btn-admin purple" onclick="quickAdminLogin()" style="justify-content:center; padding:12px;">
+          ⚡ 1-Click Quick Login as Admin (admin / admin123)
+        </button>
+        <a href="login.html" class="btn-admin outline" style="justify-content:center; text-decoration:none; color:#cbd5e1; border-color:rgba(255,255,255,0.2);">
+          Go to Standard Login Page
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast"></div>
+
+  <!-- ================= LOGIC SCRIPT ================= -->
+  <script>
+    const API_BASE = window.location.origin.startsWith("http")
+      ? window.location.origin
+      : "http://localhost:5000";
+
+    let currentUserPage = 1;
+    let currentRestPage = 1;
+    let currentReviewPage = 1;
+    let userSearchTimeout = null;
+    let restSearchTimeout = null;
+    let reviewSearchTimeout = null;
+    let userRolesChart = null;
+    let cityDistChart = null;
+
+    // Token & Auth Helper
+    function getAuthHeaders() {
+      const token = localStorage.getItem("token");
+      return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      };
+    }
+
+    // Check Auth on page load
+    async function checkAdminAuth() {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+
+      if (!token || role !== "admin") {
+        document.getElementById("auth-overlay").style.display = "flex";
+        return false;
+      }
+
+      document.getElementById("auth-overlay").style.display = "none";
+      const username = localStorage.getItem("username") || "Admin";
+      document.getElementById("header-username").innerText = username;
+      document.getElementById("header-avatar").innerText = username.charAt(0).toUpperCase();
+      return true;
+    }
+
+    // Quick Admin Login
+    async function quickAdminLogin() {
+      try {
+        // Ensure admin user exists in DB first
+        await fetch(`${API_BASE}/api/admin/setup`, { method: "POST" });
+
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: "admin", password: "admin123" })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("role", data.role);
+          localStorage.setItem("username", data.username);
+          document.getElementById("auth-overlay").style.display = "none";
+          showToast("Admin session authenticated! Loading console...");
+          initConsole();
+        } else {
+          alert(data.msg || "Admin login failed");
+        }
+      } catch(e) {
+        console.error(e);
+        alert("Server connection error");
+      }
+    }
+
+    function adminLogout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("username");
+      window.location.href = "login.html";
+    }
+
+    // Toast UI
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.style.display = "flex";
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 3500);
+    }
+
+    // Modal helpers
+    function openModal(id) { document.getElementById(id).classList.add("show"); }
+    function closeModal(id) { document.getElementById(id).classList.remove("show"); }
+
+    // Tab Navigation
+    function switchAdminTab(tabName) {
+      document.querySelectorAll(".nav-item").forEach(btn => btn.classList.remove("active"));
+      document.querySelectorAll(".tab-section").forEach(sec => sec.classList.remove("active"));
+
+      const activeNav = document.getElementById(`admin-tab-btn-${tabName}`);
+      if (activeNav) activeNav.classList.add("active");
+
+      const target = document.getElementById(`tab-${tabName}`);
+      if (target) target.classList.add("active");
+
+      if (window.location.hash !== "#" + tabName) {
+        history.replaceState(null, null, "#" + tabName);
+      }
+
+      // Load specific tab data
+      if (tabName === "overview") loadOverviewStats();
+      else if (tabName === "users") loadUsers(1);
+      else if (tabName === "restaurants") loadRestaurants(1);
+      else if (tabName === "reviews") loadReviews(1);
+      else if (tabName === "broadcasts") loadBroadcasts();
+    }
+
+    // ================= 1. OVERVIEW & STATS =================
+    async function loadOverviewStats() {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/stats`, {
+          headers: getAuthHeaders()
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          document.getElementById("auth-overlay").style.display = "flex";
+          return;
+        }
+
+        const data = await res.json();
+        const s = data.summary;
+
+        document.getElementById("stat-total-users").innerText = (s.totalUsers || 0).toLocaleString();
+        document.getElementById("stat-user-breakdown").innerText = `${s.dinersCount || 0} Diners • ${s.ownersCount || 0} Owners • ${s.adminsCount || 0} Admins`;
+        
+        document.getElementById("stat-total-restaurants").innerText = (s.totalRestaurants || 0).toLocaleString();
+        document.getElementById("stat-restaurants-sub").innerText = `Avg Dining Cost: ₹${s.avgCost || 0} for two`;
+
+        document.getElementById("stat-total-reviews").innerText = (s.totalReviews || 0).toLocaleString();
+        document.getElementById("stat-avg-rating").innerText = `Avg Platform Rating: ${s.avgRating || 0} ★`;
+
+        document.getElementById("stat-total-notifications").innerText = (s.totalNotifications || 0).toLocaleString();
+
+        // Render Recent Users
+        const uBody = document.getElementById("recent-users-body");
+        if (data.recentUsers && data.recentUsers.length > 0) {
+          uBody.innerHTML = data.recentUsers.map(u => `
+            <tr>
+              <td><strong>${escapeHtml(u.username)}</strong><br><span style="font-size:12px; color:#64748b;">${escapeHtml(u.email || "")}</span></td>
+              <td><span class="role-badge ${u.role}">${u.role}</span></td>
+              <td><span class="status-badge ${u.verified ? 'verified' : 'unverified'}">${u.verified ? '✓ Verified' : 'Pending'}</span></td>
+            </tr>
+          `).join("");
+        } else {
+          uBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#64748b;">No recent users</td></tr>`;
+        }
+
+        // Render Recent Reviews
+        const rBody = document.getElementById("recent-reviews-body");
+        if (data.recentReviews && data.recentReviews.length > 0) {
+          rBody.innerHTML = data.recentReviews.map(r => `
+            <tr>
+              <td><strong>${escapeHtml(r.restaurantName)}</strong></td>
+              <td><span style="font-weight:700; color:#eab308;">${r.rating} ★</span></td>
+              <td>${escapeHtml(r.userName)}</td>
+            </tr>
+          `).join("");
+        } else {
+          rBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#64748b;">No recent reviews</td></tr>`;
+        }
+
+        // Render User Roles Doughnut Chart
+        renderUserRolesChart(s.dinersCount, s.ownersCount, s.adminsCount);
+
+        // Render City Distribution Bar Chart
+        if (data.cityDistribution && data.cityDistribution.length > 0) {
+          renderCityChart(data.cityDistribution);
+        }
+
+      } catch (err) {
+        console.error("LOAD OVERVIEW ERROR:", err);
+      }
+    }
+
+    function renderUserRolesChart(diners, owners, admins) {
+      const ctx = document.getElementById("userRolesChart").getContext("2d");
+      if (userRolesChart) userRolesChart.destroy();
+
+      userRolesChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Diners", "Owners", "Admins"],
+          datasets: [{
+            data: [diners || 0, owners || 0, admins || 0],
+            backgroundColor: ["#3b82f6", "#f97316", "#8b5cf6"],
+            borderWidth: 2,
+            borderColor: "#ffffff"
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "bottom" }
+          }
+        }
+      });
+    }
+
+    function renderCityChart(cityDist) {
+      const ctx = document.getElementById("cityDistChart").getContext("2d");
+      if (cityDistChart) cityDistChart.destroy();
+
+      cityDistChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: cityDist.map(c => c.city),
+          datasets: [{
+            label: "Total Restaurants",
+            data: cityDist.map(c => c.count),
+            backgroundColor: "#f97316",
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    // ================= 2. USERS MANAGEMENT =================
+    async function loadUsers(page = 1) {
+      currentUserPage = page;
+      const search = document.getElementById("user-search-input").value;
+      const role = document.getElementById("user-role-filter").value;
+
+      try {
+        const url = new URL(`${API_BASE}/api/admin/users`);
+        url.searchParams.append("page", page);
+        url.searchParams.append("limit", 15);
+        if (search) url.searchParams.append("search", search);
+        if (role) url.searchParams.append("role", role);
+
+        const res = await fetch(url, { headers: getAuthHeaders() });
+        const data = await res.json();
+
+        document.getElementById("user-count-display").innerText = `Showing ${data.users.length} of ${data.total} users`;
+        document.getElementById("user-page-info").innerText = `Page ${data.page} of ${data.totalPages || 1}`;
+        document.getElementById("user-prev-btn").disabled = data.page <= 1;
+        document.getElementById("user-next-btn").disabled = data.page >= data.totalPages;
+
+        const tbody = document.getElementById("users-table-body");
+        if (!data.users || data.users.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:#64748b;">No users match your criteria</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = data.users.map(u => `
+          <tr>
+            <td>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:32px; height:32px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-weight:700; color:#475569; font-size:13px;">
+                  ${u.username ? u.username.charAt(0).toUpperCase() : "U"}
+                </div>
+                <div>
+                  <strong>${escapeHtml(u.username)}</strong>
+                  <div style="font-size:11.5px; color:#94a3b8;">ID: ${u._id}</div>
+                </div>
+              </div>
+            </td>
+            <td>${escapeHtml(u.email || "No email")}</td>
+            <td>
+              <select onchange="updateUserRole('${u._id}', this.value)" class="admin-select" style="padding:4px 8px; font-size:12px; width:auto; font-weight:600;">
+                <option value="user" ${u.role === 'user' ? 'selected' : ''}>Diner</option>
+                <option value="owner" ${u.role === 'owner' ? 'selected' : ''}>Owner</option>
+                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+              </select>
+            </td>
+            <td>
+              <span class="status-badge ${u.verified ? 'verified' : 'unverified'}" onclick="toggleUserStatus('${u._id}', ${!u.verified})">
+                ${u.verified ? '✓ Verified' : '⚠ Unverified'}
+              </span>
+            </td>
+            <td style="text-align:right;">
+              <button class="action-btn delete" onclick="deleteUser('${u._id}', '${escapeHtml(u.username)}')">Delete</button>
+            </td>
+          </tr>
+        `).join("");
+
+      } catch (err) {
+        console.error("LOAD USERS ERROR:", err);
+      }
+    }
+
+    function changeUserPage(delta) {
+      loadUsers(currentUserPage + delta);
+    }
+
+    function debounceUserSearch() {
+      clearTimeout(userSearchTimeout);
+      userSearchTimeout = setTimeout(() => loadUsers(1), 350);
+    }
+
+    async function updateUserRole(userId, newRole) {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/users/${userId}/role`, {
+          method: "PUT",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ role: newRole })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg || "User role updated");
+          loadOverviewStats();
+        } else {
+          alert(data.msg || "Failed to update role");
+          loadUsers(currentUserPage);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function toggleUserStatus(userId, newStatus) {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/users/${userId}/status`, {
+          method: "PUT",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ verified: newStatus })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg || "Status updated");
+          loadUsers(currentUserPage);
+        } else {
+          alert(data.msg || "Failed to update status");
+        }
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    async function deleteUser(userId, username) {
+      if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/users/${userId}`, {
+          method: "DELETE",
+          headers: getAuthHeaders()
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg || "User deleted");
+          loadUsers(currentUserPage);
+          loadOverviewStats();
+        } else {
+          alert(data.msg || "Failed to delete user");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function openCreateUserModal() {
+      document.getElementById("new-user-name").value = "";
+      document.getElementById("new-user-email").value = "";
+      document.getElementById("new-user-pass").value = "";
+      openModal("modal-create-user");
+    }
+
+    async function submitCreateUser() {
+      const username = document.getElementById("new-user-name").value.trim();
+      const email = document.getElementById("new-user-email").value.trim();
+      const password = document.getElementById("new-user-pass").value.trim();
+      const role = document.getElementById("new-user-role").value;
+
+      if (!username || !email || !password) {
+        alert("Please complete all user fields");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/users`, {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ username, email, password, role })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          closeModal("modal-create-user");
+          showToast("User account created successfully!");
+          loadUsers(1);
+          loadOverviewStats();
+        } else {
+          alert(data.msg || "Failed to create user");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // ================= 3. RESTAURANT CATALOG =================
+    async function loadRestaurants(page = 1) {
+      currentRestPage = page;
+      const search = document.getElementById("rest-search-input").value;
+      const city = document.getElementById("rest-city-filter").value;
+
+      try {
+        const url = new URL(`${API_BASE}/api/admin/restaurants`);
+        url.searchParams.append("page", page);
+        url.searchParams.append("limit", 15);
+        if (search) url.searchParams.append("search", search);
+        if (city) url.searchParams.append("city", city);
+
+        const res = await fetch(url, { headers: getAuthHeaders() });
+        const data = await res.json();
+
+        // Populate city dropdown if empty
+        const citySelect = document.getElementById("rest-city-filter");
+        if (citySelect.options.length <= 1 && data.cities) {
+          data.cities.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c;
+            opt.innerText = c;
+            citySelect.appendChild(opt);
+          });
+        }
+
+        document.getElementById("rest-count-display").innerText = `Showing ${data.restaurants.length} of ${data.total} listings`;
+        document.getElementById("rest-page-info").innerText = `Page ${data.page} of ${data.totalPages || 1}`;
+        document.getElementById("rest-prev-btn").disabled = data.page <= 1;
+        document.getElementById("rest-next-btn").disabled = data.page >= data.totalPages;
+
+        const tbody = document.getElementById("restaurants-table-body");
+        if (!data.restaurants || data.restaurants.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:#64748b;">No restaurants found</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = data.restaurants.map(r => `
+          <tr>
+            <td>
+              <strong>${escapeHtml(r.name)}</strong>
+              <div style="font-size:12px; color:#64748b;">📍 ${escapeHtml(r.locality || r.address || "")} • <strong>${escapeHtml(r.city || "Bangalore")}</strong></div>
+            </td>
+            <td><span style="font-size:12.5px; color:#475569;">${escapeHtml(r.cuisines || "Multi-Cuisine")}</span></td>
+            <td>
+              <span style="font-weight:700; color:#15803d;">${r.rating ? r.rating + ' ★' : '--'}</span>
+              <span style="font-size:12px; color:#64748b;">(₹${r.cost || 600} for 2)</span>
+            </td>
+            <td>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-badge ${r.reviewConfidenceLevel === 'High' ? 'verified' : 'unverified'}">
+                  ${r.reviewConfidenceScore || 85}% ${r.reviewConfidenceLevel || 'High'} Trust
+                </span>
+                <button class="action-btn audit" onclick="auditRestaurant('${r._id}')" title="Recompute authenticity confidence">🔍 Audit</button>
+              </div>
+            </td>
+            <td style="text-align:right;">
+              <button class="action-btn edit" onclick="openEditRestaurantModal('${r._id}')">Edit</button>
+              <button class="action-btn delete" onclick="deleteRestaurant('${r._id}', '${escapeHtml(r.name)}')">Delete</button>
+            </td>
+          </tr>
+        `).join("");
+
+      } catch (err) {
+        console.error("LOAD RESTAURANTS ERROR:", err);
+      }
+    }
+
+    function changeRestPage(delta) {
+      loadRestaurants(currentRestPage + delta);
+    }
+
+    function debounceRestSearch() {
+      clearTimeout(restSearchTimeout);
+      restSearchTimeout = setTimeout(() => loadRestaurants(1), 350);
+    }
+
+    async function auditRestaurant(restId) {
+      try {
+        showToast("Running AI Spam & Authenticity audit...");
+        const res = await fetch(`${API_BASE}/api/admin/restaurants/${restId}/audit`, {
+          method: "POST",
+          headers: getAuthHeaders()
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(`Audit complete: ${data.confidenceScore}% (${data.confidenceLevel})`);
+          loadRestaurants(currentRestPage);
+        } else {
+          alert("Audit failed");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function openAddRestaurantModal() {
+      document.getElementById("modal-rest-title").innerText = "Add New Restaurant";
+      document.getElementById("edit-rest-id").value = "";
+      document.getElementById("rest-form-name").value = "";
+      document.getElementById("rest-form-city").value = "Bangalore";
+      document.getElementById("rest-form-locality").value = "";
+      document.getElementById("rest-form-cuisines").value = "";
+      document.getElementById("rest-form-cost").value = "700";
+      document.getElementById("rest-form-rating").value = "4.0";
+      document.getElementById("rest-form-lat").value = "12.9716";
+      document.getElementById("rest-form-lon").value = "77.5946";
+      openModal("modal-restaurant");
+    }
+
+    async function openEditRestaurantModal(id) {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/restaurants/${id}`, {
+          headers: getAuthHeaders()
+        });
+        const r = await res.json();
+        document.getElementById("modal-rest-title").innerText = `Edit ${r.name}`;
+        document.getElementById("edit-rest-id").value = r._id;
+        document.getElementById("rest-form-name").value = r.name || "";
+        document.getElementById("rest-form-city").value = r.city || "";
+        document.getElementById("rest-form-locality").value = r.locality || "";
+        document.getElementById("rest-form-cuisines").value = r.cuisines || "";
+        document.getElementById("rest-form-cost").value = r.cost || 600;
+        document.getElementById("rest-form-rating").value = r.rating || 4.0;
+        document.getElementById("rest-form-lat").value = r.latitude || 12.9716;
+        document.getElementById("rest-form-lon").value = r.longitude || 77.5946;
+        openModal("modal-restaurant");
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function submitRestaurantForm() {
+      const editId = document.getElementById("edit-rest-id").value;
+      const name = document.getElementById("rest-form-name").value.trim();
+      const city = document.getElementById("rest-form-city").value.trim();
+      const locality = document.getElementById("rest-form-locality").value.trim();
+      const cuisines = document.getElementById("rest-form-cuisines").value.trim();
+      const cost = document.getElementById("rest-form-cost").value;
+      const rating = document.getElementById("rest-form-rating").value;
+      const latitude = document.getElementById("rest-form-lat").value;
+      const longitude = document.getElementById("rest-form-lon").value;
+
+      if (!name) {
+        alert("Restaurant name is required");
+        return;
+      }
+
+      const payload = { name, city, locality, cuisines, cost, rating, latitude, longitude };
+
+      try {
+        const url = editId
+          ? `${API_BASE}/api/admin/restaurants/${editId}`
+          : `${API_BASE}/api/admin/restaurants`;
+        const method = editId ? "PUT" : "POST";
+
+        const res = await fetch(url, {
+          method,
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          closeModal("modal-restaurant");
+          showToast(data.msg || "Restaurant saved successfully!");
+          loadRestaurants(currentRestPage);
+          loadOverviewStats();
+        } else {
+          alert(data.msg || "Failed to save restaurant");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function deleteRestaurant(id, name) {
+      if (!confirm(`Are you sure you want to delete restaurant "${name}"?`)) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/restaurants/${id}`, {
+          method: "DELETE",
+          headers: getAuthHeaders()
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg || "Restaurant deleted");
+          loadRestaurants(currentRestPage);
+          loadOverviewStats();
+        } else {
+          alert(data.msg || "Failed to delete restaurant");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // ================= 4. REVIEW MODERATION =================
+    async function loadReviews(page = 1) {
+      currentReviewPage = page;
+      const search = document.getElementById("review-search-input").value;
+      const rating = document.getElementById("review-rating-filter").value;
+
+      try {
+        const url = new URL(`${API_BASE}/api/admin/reviews`);
+        url.searchParams.append("page", page);
+        url.searchParams.append("limit", 15);
+        if (search) url.searchParams.append("search", search);
+        if (rating) url.searchParams.append("rating", rating);
+
+        const res = await fetch(url, { headers: getAuthHeaders() });
+        const data = await res.json();
+
+        document.getElementById("review-count-display").innerText = `${data.total} reviews found`;
+        document.getElementById("review-page-info").innerText = `Page ${data.page} of ${data.totalPages || 1}`;
+        document.getElementById("review-prev-btn").disabled = data.page <= 1;
+        document.getElementById("review-next-btn").disabled = data.page >= data.totalPages;
+
+        const tbody = document.getElementById("reviews-table-body");
+        if (!data.reviews || data.reviews.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#64748b;">No reviews found</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = data.reviews.map(r => `
+          <tr>
+            <td><strong>${escapeHtml(r.restaurantName)}</strong></td>
+            <td><span style="font-weight:700; color:#eab308;">${r.rating} ★</span></td>
+            <td>${escapeHtml(r.userName)}</td>
+            <td style="max-width:320px; font-size:13px; color:#475569;">${escapeHtml(r.text)}</td>
+            <td style="font-size:12px; color:#94a3b8;">${new Date(r.createdAt).toLocaleDateString()}</td>
+            <td style="text-align:right;">
+              <button class="action-btn delete" onclick="deleteReview('${r._id}')">Remove</button>
+            </td>
+          </tr>
+        `).join("");
+
+      } catch (err) {
+        console.error("LOAD REVIEWS ERROR:", err);
+      }
+    }
+
+    function changeReviewPage(delta) {
+      loadReviews(currentReviewPage + delta);
+    }
+
+    function debounceReviewSearch() {
+      clearTimeout(reviewSearchTimeout);
+      reviewSearchTimeout = setTimeout(() => loadReviews(1), 350);
+    }
+
+    async function deleteReview(id) {
+      if (!confirm("Are you sure you want to remove this review?")) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/reviews/${id}`, {
+          method: "DELETE",
+          headers: getAuthHeaders()
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg || "Review removed");
+          loadReviews(currentReviewPage);
+          loadOverviewStats();
+        } else {
+          alert("Failed to delete review");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // ================= 5. BROADCASTS & NOTIFICATIONS =================
+    async function loadBroadcasts() {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/notifications`, {
+          headers: getAuthHeaders()
+        });
+        const notifs = await res.json();
+
+        const tbody = document.getElementById("broadcasts-table-body");
+        if (!notifs || notifs.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#64748b;">No broadcasts sent yet</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = notifs.map(n => `
+          <tr>
+            <td>
+              <strong>${escapeHtml(n.title)}</strong>
+              <div style="font-size:12px; color:#64748b; max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                ${escapeHtml(n.message)}
+              </div>
+            </td>
+            <td><span class="role-badge ${n.type.toLowerCase()}">${n.type}</span></td>
+            <td><span style="font-size:12.5px; font-weight:600; color:#475569;">${n.audienceType || 'All'}</span></td>
+            <td><strong style="color:#10b981;">${n.stats ? n.stats.delivered : 0}</strong> users</td>
+            <td style="font-size:12px; color:#94a3b8;">${new Date(n.createdAt).toLocaleDateString()}</td>
+            <td style="text-align:right;">
+              <button class="action-btn delete" onclick="deleteBroadcast('${n._id}')">Revoke</button>
+            </td>
+          </tr>
+        `).join("");
+
+      } catch (e) {
+        console.error("LOAD BROADCASTS ERROR:", e);
+      }
+    }
+
+    function openBroadcastModal() {
+      document.getElementById("broadcast-title").value = "";
+      document.getElementById("broadcast-msg").value = "";
+      openModal("modal-broadcast");
+    }
+
+    async function submitBroadcast() {
+      const title = document.getElementById("broadcast-title").value.trim();
+      const message = document.getElementById("broadcast-msg").value.trim();
+      const type = document.getElementById("broadcast-type").value;
+      const targetAudience = document.getElementById("broadcast-audience").value;
+
+      if (!title || !message) {
+        alert("Broadcast title and message are required");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/broadcast`, {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ title, message, type, targetAudience })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          closeModal("modal-broadcast");
+          showToast(data.msg || "Broadcast sent!");
+          loadBroadcasts();
+          loadOverviewStats();
+        } else {
+          alert(data.msg || "Broadcast failed");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function deleteBroadcast(id) {
+      if (!confirm("Revoke and remove this broadcast notification?")) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/notifications/${id}`, {
+          method: "DELETE",
+          headers: getAuthHeaders()
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.msg || "Broadcast removed");
+          loadBroadcasts();
+          loadOverviewStats();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // ================= 6. SYSTEM HEALTH CONTROLS =================
+    async function runQuickSeed() {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/setup`, { method: "POST" });
+        const data = await res.json();
+        showToast(data.msg || "Admin initialized");
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    // Utility: XSS escape
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Init Console
+    async function initConsole() {
+      const ok = await checkAdminAuth();
+      if (ok) {
+        const hash = window.location.hash.replace("#", "");
+        if (hash && ["overview", "users", "restaurants", "reviews", "broadcasts", "system"].includes(hash)) {
+          switchAdminTab(hash);
+        } else {
+          loadOverviewStats();
+        }
+      }
+    }
+
+    window.addEventListener("hashchange", () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && ["overview", "users", "restaurants", "reviews", "broadcasts", "system"].includes(hash)) {
+        switchAdminTab(hash);
+      }
+    });
+
+    window.addEventListener("DOMContentLoaded", initConsole);
+  </script>
+
+  <!-- AI Chatbot Widget -->
+  <link rel="stylesheet" href="ChatWidget/chat-widget.css">
+  <script src="ChatWidget/chat-widget.js"></script>
+
+</body>
+</html>

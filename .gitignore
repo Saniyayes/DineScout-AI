@@ -1,0 +1,5 @@
+node_modules/
+*.mp4
+*.docx
+__pycache__/
+.env
