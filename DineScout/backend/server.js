@@ -1,5 +1,6 @@
 // Fix: some networks/ISPs refuse SRV DNS lookups (querySrv ECONNREFUSED)
-require("dns").setServers(["8.8.8.8", "1.1.1.1"]);
+// Local-only DNS override (Render's own DNS works fine)
+if (!process.env.RENDER) require("dns").setServers(["8.8.8.8", "1.1.1.1"]);
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -62,9 +63,12 @@ cron.schedule("* * * * *", async () => {
 
 
 // ================= OWNER ROUTES =================
+// Python (Flask) analytics service. On Render, set PY_API_URL to its public URL.
+const PY_API_URL = (process.env.PY_API_URL || "http://127.0.0.1:7000").replace(/\/$/, "");
+
 app.get("/api/owner/meta", async (req, res) => {
   try {
-    const r = await axios.get("http://127.0.0.1:7000/meta");
+    const r = await axios.get(`${PY_API_URL}/meta`);
     res.json(r.data);
   } catch (err) {
     console.log("META ERROR:", err.message);
@@ -75,7 +79,7 @@ app.get("/api/owner/meta", async (req, res) => {
 app.post("/api/owner/market-analysis", async (req, res) => {
   try {
     const r = await axios.post(
-      "http://127.0.0.1:7000/market-analysis",
+      `${PY_API_URL}/market-analysis`,
       req.body
     );
     res.json(r.data);
@@ -358,13 +362,15 @@ app.use(express.static(
 mongoose.connect(
   process.env.MONGO_URI || "mongodb://127.0.0.1:27017/dinescout"
 )
-.then(() => console.log("MongoDB Connected ✅"))
+.then(async () => {
+  console.log("MongoDB Connected ✅ db:", mongoose.connection.name);
+  console.log("Restaurants in DB:", await Restaurant.countDocuments());
+})
 .catch(e => console.log("Mongo Error:", e));
 
 
 // ================= SERVER =================
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT} 🚀`);
 });

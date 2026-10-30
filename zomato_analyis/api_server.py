@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
@@ -8,7 +9,7 @@ CORS(app)
 
 # ================= LOAD DATA =================
 
-df = pd.read_csv("zomato.csv", encoding="latin1")
+df = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "zomato.csv"), encoding="latin1")
 
 
 # Prepare cuisine list column once
@@ -181,6 +182,6 @@ if __name__ == "__main__":
 
     app.run(
         host="0.0.0.0",
-        port=7000,
-        debug=True
+        port=int(os.environ.get("PORT", 7000)),
+        debug=False
     )
