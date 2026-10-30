@@ -1281,31 +1281,14 @@
 <div class="portal-grid-overlay" aria-hidden="true"></div>
 
 <!-- Authentication Guard & Role Detection -->
+
 <script>
-  let token = localStorage.getItem("token");
-  if (!token && !localStorage.getItem("manual_logout")) {
-    fetch("http://localhost:5000/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: "testuser2", password: "123456" })
-    })
-    .then(r => r.json())
-    .then(d => {
-      if (d.token) {
-        localStorage.setItem("token", d.token);
-        localStorage.setItem("role", d.role || "user");
-        localStorage.setItem("username", d.username || "testuser2");
-        window.location.reload();
-      } else {
-        window.location.href = "login.html";
-      }
-    })
-    .catch(() => {
-      window.location.href = "login.html";
-    });
-  } else if (!token) {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
     window.location.href = "login.html";
   }
+
 
   // Theme Functions
   function togglePortalTheme() {
