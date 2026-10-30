@@ -320,7 +320,7 @@ async function register() {
   try {
     const endpoint = window.location.origin.startsWith("http")
       ? `${window.location.origin}/api/auth/register`
-      : "http://localhost:5000/api/auth/register";
+      : "https://dinescout-ai.onrender.com/api/auth/register";
 
     const res = await fetch(endpoint, {
       method: "POST",
@@ -375,7 +375,7 @@ async function verifyOTP() {
   try {
     const endpoint = window.location.origin.startsWith("http")
       ? `${window.location.origin}/api/auth/verify`
-      : "http://localhost:5000/api/auth/verify";
+      : "https://dinescout-ai.onrender.com/api/auth/verify";
 
     const res = await fetch(endpoint, {
       method: "POST",

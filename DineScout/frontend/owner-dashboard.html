@@ -673,7 +673,7 @@ async function initOwnerAuth() {
   // If role is diner (user) or token missing, auto-authenticate as testowner for seamless access
   if (!token || role === "user") {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch("https://dinescout-ai.onrender.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: "testowner", password: "123456" })
@@ -714,7 +714,7 @@ async function loadData() {
     const citySelect = document.getElementById("city");
     const cuisineSelect = document.getElementById("cuisine");
 
-    const res = await fetch("http://localhost:5000/api/owner/meta");
+    const res = await fetch("https://dinescout-ai.onrender.com/api/owner/meta");
     const data = await res.json();
 
     citySelect.innerHTML = "";
@@ -765,7 +765,7 @@ async function analyze() {
     console.log("Running comprehensive analysis for:", cityValue, cuisineValue);
 
     // 1. Core Market Analysis
-    const res = await fetch("http://localhost:5000/api/owner/market-analysis", {
+    const res = await fetch(`${API_BASE_URL}/api/owner/market-analysis`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ city: cityValue, cuisine: cuisineValue })
@@ -847,7 +847,7 @@ async function loadCompetitorBenchmarking(city, cuisine, price, rating, restaura
   section.style.display = "block";
 
   try {
-    const res = await fetch("http://localhost:5000/api/owner/competitor-benchmarking", {
+    const res = await fetch(`${API_BASE_URL}/api/owner/competitor-benchmarking`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ city, cuisine, price, rating, restaurantName })
@@ -956,7 +956,7 @@ async function loadReviewActionInsights(city, cuisine, rating) {
   section.style.display = "block";
 
   try {
-    const res = await fetch("http://localhost:5000/api/owner/review-action-insights", {
+    const res = await fetch(`${API_BASE_URL}/api/owner/review-action-insights`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ city, cuisine, currentRating: rating })
@@ -1055,7 +1055,7 @@ async function aiWriteMessage() {
   if (writeBtn) writeBtn.innerText = "✨ Writing...";
 
   try {
-    const res = await fetch("http://localhost:5000/api/notifications/ai/write", {
+    const res = await fetch(`${API_BASE_URL}/api/notifications/ai/write`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": token },
       body: JSON.stringify({ idea })
@@ -1093,7 +1093,7 @@ async function analyzeNotificationScore() {
   }
   const token = localStorage.getItem("token");
   try {
-    const res = await fetch("http://localhost:5000/api/notifications/ai/score", {
+    const res = await fetch(`${API_BASE_URL}/api/notifications/ai/score`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": token },
       body: JSON.stringify({ message })
@@ -1120,7 +1120,7 @@ async function aiPredictTime() {
   if (timeBtn) timeBtn.innerText = "⏳ Analyzing Habits...";
 
   try {
-    const res = await fetch("http://localhost:5000/api/notifications/ai/predict", {
+    const res = await fetch(`${API_BASE_URL}/api/notifications/ai/predict`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": token }
     });
@@ -1144,7 +1144,7 @@ async function aiAnalyzeAudience() {
   if (reachBtn) reachBtn.innerText = "📡 Calculating...";
 
   try {
-    const res = await fetch("http://localhost:5000/api/notifications/ai/audience", {
+    const res = await fetch(`${API_BASE_URL}/api/notifications/ai/audience`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": token }
     });
@@ -1188,7 +1188,7 @@ async function sendNotification() {
   }
 
   try {
-    const res = await fetch("http://localhost:5000/api/notifications", {
+    const res = await fetch(`${API_BASE_URL}/api/notifications`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": token },
       body: JSON.stringify({ title, message, type, audienceType, restaurantName })
@@ -1224,7 +1224,7 @@ async function loadNotificationHistory() {
   if (!tbody) return;
 
   try {
-    const res = await fetch("http://localhost:5000/api/notifications/owner", {
+    const res = await fetch(`${API_BASE_URL}/api/notifications/owner`, {
       headers: { "Authorization": token }
     });
     if (!res.ok) {
@@ -1268,7 +1268,7 @@ async function loadAdvisorData() {
   
   try {
     // 1. Load Competitors
-    const compRes = await fetch(`http://localhost:5000/api/advisor/competitors?city=${encodeURIComponent(cityValue)}&cuisine=${encodeURIComponent(cuisineValue)}&restCost=${restCost}&restRating=${restRating}`);
+    const compRes = await fetch(`${API_BASE_URL}/api/advisor/competitors?city=${encodeURIComponent(cityValue)}&cuisine=${encodeURIComponent(cuisineValue)}&restCost=${restCost}&restRating=${restRating}`);
     const compData = await compRes.json();
     
     let compHtml = "<strong>Top Competitors:</strong><ul style='padding-left: 20px; margin-top:8px;'>";
@@ -1325,7 +1325,7 @@ async function loadAdvisorData() {
 
     // 2. Load Sentiment
     const restName = document.getElementById("owner-rest-name") ? document.getElementById("owner-rest-name").value : "My Restaurant";
-    const sentRes = await fetch(`http://localhost:5000/api/advisor/sentiment?city=${encodeURIComponent(cityValue)}&cuisine=${encodeURIComponent(cuisineValue)}&restName=${encodeURIComponent(restName)}`);
+    const sentRes = await fetch(`${API_BASE_URL}/api/advisor/sentiment?city=${encodeURIComponent(cityValue)}&cuisine=${encodeURIComponent(cuisineValue)}&restName=${encodeURIComponent(restName)}`);
     const sentData = await sentRes.json();
     
     const ctxSent = document.getElementById("sentimentChart").getContext("2d");
@@ -1357,7 +1357,7 @@ async function loadAdvisorData() {
     document.getElementById("adv-complaints").innerHTML = sentData.complaints.map(s => `<li>${s}</li>`).join("");
 
     // 3. Load Prediction
-    const predRes = await fetch("http://localhost:5000/api/advisor/predict", {
+    const predRes = await fetch(`${API_BASE_URL}/api/advisor/predict`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ city: cityValue, cuisine: cuisineValue, cost: restCost, capacity })
@@ -1433,7 +1433,7 @@ async function loadLocationData() {
   document.getElementById("loc-ai-summary").innerHTML = `Loading AI Strategy...`;
 
   try {
-    const res = await fetch(`http://localhost:5000/api/location/opportunity?city=${encodeURIComponent(cityValue)}&cuisine=${encodeURIComponent(cuisineValue)}&cost=${restCost}`);
+    const res = await fetch(`${API_BASE_URL}/api/location/opportunity?city=${encodeURIComponent(cityValue)}&cuisine=${encodeURIComponent(cuisineValue)}&cost=${restCost}`);
     const data = await res.json();
     currentAreas = data.areas;
     

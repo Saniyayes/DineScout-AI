@@ -146,7 +146,7 @@
 
       const chatEndpoint = window.location.origin.startsWith("http")
         ? `${window.location.origin}/api/chat`
-        : "http://localhost:5000/api/chat";
+        : "https://dinescout-ai.onrender.com/api/chat";
 
       const res = await fetch(chatEndpoint, {
         method: "POST",
