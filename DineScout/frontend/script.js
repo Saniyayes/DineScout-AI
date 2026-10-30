@@ -1,3 +1,4 @@
+const API_BASE_URL = "https://dinescout-ai.onrender.com";
 var userLat = window.userLat || null;
 var userLon = window.userLon || null;
 var userCity = window.userCity || null;
@@ -88,8 +89,9 @@ async function searchByMood() {
   try {
     const lat = userLat || 12.9716;
     const lon = userLon || 77.5946;
-    let url = `http://localhost:5000/api/restaurants/mood-search?query=${encodeURIComponent(effectiveQuery + (locality ? ' ' + locality : ''))}&lat=${lat}&lon=${lon}`;
-    if (budget) url += `&budget=${budget}`;
+    let url = `https://dinescout-ai.onrender.com/api/restaurants/mood-search?query=${encodeURIComponent(effectiveQuery + (locality ? ' ' + locality : ''))}&lat=${lat}&lon=${lon}`;
+
+if (budget) url += `&budget=${budget}`;
 
     const res = await fetch(url, {
       headers: { Authorization: token }
@@ -161,13 +163,13 @@ function searchRestaurants() {
 
   const lat = userLat || 12.9716;
   const lon = userLon || 77.5946;
-
   fetch(
-    `http://localhost:5000/api/restaurants/search?cuisine=${encodeURIComponent(cuisine)}&budget=${budget || 99999}&lat=${lat}&lon=${lon}`,
-    {
-      headers: { Authorization: token }
-    }
-  )
+  `${API_BASE_URL}/api/restaurants/search?cuisine=${encodeURIComponent(cuisine)}&budget=${budget || 99999}&lat=${lat}&lon=${lon}`,
+  {
+    headers: { Authorization: token }
+  }
+)
+
     .then(res => {
       if (res.status === 401) {
         alert("Session expired");
@@ -524,9 +526,13 @@ async function loadTrendingOnStart() {
   try {
     const lat = userLat || 12.9716;
     const lon = userLon || 77.5946;
-    const res = await fetch(`http://localhost:5000/api/restaurants/search?lat=${lat}&lon=${lon}&sortMode=rating`, {
-      headers: { Authorization: token }
-    });
+    const res = await fetch(
+  `${API_BASE_URL}/api/restaurants/search?lat=${lat}&lon=${lon}&sortMode=rating`,
+  {
+    headers: { Authorization: token }
+  }
+);
+    
     if (res.ok) {
       const data = await res.json();
       showResults(data || [], `🔥 Featured & Trending Spots in Bangalore`);
@@ -552,9 +558,12 @@ async function openReviewSummary(restaurantId) {
   `;
 
   try {
-    const res = await fetch(`http://localhost:5000/api/restaurants/${restaurantId}/review-summary`, {
-      headers: { Authorization: token }
-    });
+   const res = await fetch(
+  `${API_BASE_URL}/api/restaurants/${restaurantId}/review-summary`,
+  {
+    headers: { Authorization: token }
+  }
+);
 
     if (!res.ok) throw new Error("Failed to load review summary");
     const data = await res.json();
@@ -565,9 +574,12 @@ async function openReviewSummary(restaurantId) {
     // Load pricing trends
     let trendBadge = "";
     try {
-      const trendRes = await fetch(`http://localhost:5000/api/restaurants/${restaurantId}/trends`, {
-        headers: { Authorization: token }
-      });
+      const trendRes = await fetch(
+  `${API_BASE_URL}/api/restaurants/${restaurantId}/trends`,
+  {
+    headers: { Authorization: token }
+  }
+);
       if (trendRes.ok) {
         const trendData = await trendRes.json();
         trendBadge = `<span style="font-size:12px; background:#eff6ff; color:#1d4ed8; padding:3px 10px; border-radius:12px; border:1px solid #bfdbfe;">📈 ${trendData.summaryText}</span>`;
@@ -642,14 +654,12 @@ async function submitVoiceReview(restaurantId) {
 
   const token = localStorage.getItem("token");
   try {
-    const res = await fetch(`http://localhost:5000/api/restaurants/${restaurantId}/voice-review`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token
-      },
-      body: JSON.stringify({ transcript: text })
-    });
+    const res = await fetch(
+  `${API_BASE_URL}/api/restaurants/${restaurantId}/voice-review`,
+  {
+    headers: { Authorization: token }
+  }
+);
 
     if (!res.ok) throw new Error("Failed to submit voice review");
     alert("Voice review submitted successfully!");
@@ -709,7 +719,8 @@ async function loadDishRecommendations() {
 
   try {
     const city = userCity || "Bangalore";
-    let url = `http://localhost:5000/api/restaurants/dishes/recommendations?city=${city}&`;
+    let url = `${API_BASE_URL}/api/restaurants/dishes/recommendations?city=${city}&`;
+    //let url = `http://localhost:5000/api/restaurants/dishes/recommendations?city=${city}&`;
     if (cuisine) url += `cuisine=${encodeURIComponent(cuisine)}&`;
     if (maxPrice) url += `maxPrice=${maxPrice}&`;
 
@@ -772,9 +783,12 @@ async function searchFlavorDNA(flavor) {
   resultDiv.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">Matching ${flavor} flavor profile DNA across dishes...</div>`;
 
   try {
-    const res = await fetch(`http://localhost:5000/api/restaurants/dishes/flavor-search?flavor=${encodeURIComponent(flavor)}`, {
-      headers: { Authorization: token }
-    });
+    const res = await fetch(
+  `${API_BASE_URL}/api/restaurants/dishes/flavor-search?flavor=${encodeURIComponent(flavor)}`,
+  {
+    headers: { Authorization: token }
+  }
+);
 
     if (!res.ok) throw new Error("Flavor search failed");
     const data = await res.json();
@@ -843,9 +857,9 @@ async function fetchNotifications() {
   if (!token) return;
   
   try {
-    const res = await fetch("http://localhost:5000/api/notifications", {
-      headers: { Authorization: token }
-    });
+    const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+  headers: { Authorization: token }
+});
     if(res.ok) {
       const data = await res.json();
 
@@ -910,7 +924,7 @@ function renderNotifications(data) {
 async function markAsRead(id, elem) {
   const token = localStorage.getItem("token");
   try {
-    await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+    await fetch(`${API_BASE_URL}/api/notifications/${id}/read`, {
       method: "PATCH",
       headers: { Authorization: token }
     });
@@ -930,7 +944,7 @@ async function markAsRead(id, elem) {
 async function markAllNotifsRead() {
   const token = localStorage.getItem("token");
   try {
-    await fetch(`http://localhost:5000/api/notifications/read-all`, {
+    await fetch(`${API_BASE_URL}/api/notifications/read-all`, {
       method: "PATCH",
       headers: { Authorization: token }
     });
@@ -1060,7 +1074,7 @@ function initSSE() {
   const token = localStorage.getItem("token");
   if (!token) return;
   
-  const source = new EventSource(`http://localhost:5000/api/notifications/stream?token=${token}`);
+  const source = new EventSource(`${API_BASE_URL}/api/notifications/stream?token=${token}`);
   
   source.onmessage = function(event) {
     try {
@@ -1138,7 +1152,10 @@ async function initFavorites() {
   const token = localStorage.getItem("token");
   if (!token) return;
   try {
-    const res = await fetch("http://localhost:5000/api/restaurants/favorites", { headers: { Authorization: token } });
+    const res = await fetch(`${API_BASE_URL}/api/restaurants/favorites`, {
+  headers: { Authorization: token }
+});
+   // const res = await fetch("http://localhost:5000/api/restaurants/favorites", { headers: { Authorization: token } });
     if(res.ok) {
       const favs = await res.json();
       userFavorites = new Set(favs.map(f => f.restaurantId));
@@ -1154,12 +1171,12 @@ async function toggleFavorite(restaurantId, restaurantName, locality, city, btnE
   
   try {
     if (isFav) {
-      await fetch(`http://localhost:5000/api/restaurants/favorites/${restaurantId}`, { method: 'DELETE', headers: { Authorization: token } });
+      await fetch(`${API_BASE_URL}/api/restaurants/favorites/${restaurantId}`, { method: 'DELETE', headers: { Authorization: token } });
       userFavorites.delete(restaurantId);
       btnElement.innerText = "🤍";
       showSimpleToast("Removed from favorites");
     } else {
-      await fetch("http://localhost:5000/api/restaurants/favorites", {
+      await fetch(`${API_BASE_URL}/api/restaurants/favorites`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token },
         body: JSON.stringify({ restaurantId, restaurantName, locality, city })
@@ -1176,7 +1193,7 @@ async function loadFavorites() {
   resultDiv.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">Loading saved restaurants...</div>`;
   const token = localStorage.getItem("token");
   try {
-    const res = await fetch("http://localhost:5000/api/restaurants/favorites", { headers: { Authorization: token } });
+    const res = await fetch(`${API_BASE_URL}/api/restaurants/favorites`, { headers: { Authorization: token } });
     const favs = await res.json();
     if (favs.length === 0) {
       resultDiv.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:#64748b; padding:40px;">You haven't saved any restaurants yet.</p>`;
@@ -1205,7 +1222,7 @@ async function loadOffers() {
   resultDiv.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">Loading active offers...</div>`;
   const token = localStorage.getItem("token");
   try {
-    const res = await fetch("http://localhost:5000/api/notifications/offers", { headers: { Authorization: token } });
+    const res = await fetch(`${API_BASE_URL}/api/notifications/offers`, { headers: { Authorization: token } });
     const offers = await res.json();
     if (offers.length === 0) {
       resultDiv.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:40px;">No active offers right now.</p>`;
@@ -1248,7 +1265,7 @@ async function submitReview(restaurantId, restaurantName) {
 
   const token = localStorage.getItem("token");
   try {
-    const res = await fetch("http://localhost:5000/api/restaurants/reviews", {
+    const res = await fetch(`${API_BASE_URL}/api/restaurants/reviews`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: token },
       body: JSON.stringify({ restaurantId, restaurantName, rating: Number(rating), text, tags })

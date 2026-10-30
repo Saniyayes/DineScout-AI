@@ -3,3 +3,7 @@ node_modules/
 *.docx
 __pycache__/
 .env
+DineScout/backend/dinescout_load_*_stats.csv
+DineScout/backend/dinescout_load_*_stats_history.csv
+DineScout/backend/dinescout_load_*_failures.csv
+DineScout/backend/dinescout_load_*_exceptions.csv
